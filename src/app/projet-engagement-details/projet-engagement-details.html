@@ -1,0 +1,420 @@
+<div class="bg-white p-4 rounded-4">
+  @if (engagementProjet){
+    <div class="h4 text-center">
+      Feuille de route du projet : <span class="text-primary">{{ engagementProjet.nom }}</span>
+    </div>
+    <div class="border rounded-3 p-3 flex justify-center">
+      <form [formGroup]="projetForm">
+        <p-stepper
+          [value]="etape"
+          [linear]="true"
+          class="basis-[50rem]">
+          <p-step-list>
+            <p-step [value]="1">Jalons Projet</p-step>
+            <p-step [value]="2">Activités</p-step>
+            <p-step [value]="3">Prévisions & Avancements</p-step>
+            <p-step [value]="4">Indicateurs de pilotage</p-step>
+          </p-step-list>
+          <p-step-panels>
+            <p-step-panel [value]="1">
+              <ng-template #content let-activateCallback="activateCallback">
+
+                <div class=" p-2">
+                  <table class="formTable">
+                    <tr>
+                      <th id="structure" class="detailsLabel">Structure : </th>
+                      <td>{{ engagementProjet.porteur }}</td>
+                    </tr>
+                    <tr>
+                      <td class="detailsLabel">Programme : </td>
+                      <td>{{ engagementProjet.programme }}</td>
+                    </tr>
+                    <tr>
+                      <td class="detailsLabel">Objectif stratégique : </td>
+                      <td>{{ engagementProjet.os }}</td>
+                    </tr>
+
+                    <tr>
+                      <td class="detailsLabel">Axe : </td>
+                      <td>{{ engagementProjet.axe }}</td>
+                    </tr>
+
+                    <tr>
+                      <td class="detailsLabel">Partenaires : </td>
+                      <td>
+                        <p-autoComplete
+                          id="partenairesForm"
+                          inputId="chips-combined"
+                          [dropdown]="false"
+                          formControlName="partenaires"
+                          multiple fluid
+                          [dataKey]="'id'"
+                          [optionLabel]="getPartenaireLabel"
+                          [optionValue]="getPartenaireValue"
+                          [suggestions]="filteredPartenaires"
+                          (completeMethod)="searchPartenaire($event)"
+                          [addOnBlur]="true"
+                          [addOnTab]="true" ></p-autoComplete>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td class="detailsLabel">Résultats attendus : </td>
+                      <td>{{ engagementProjet.axe }}</td>
+                    </tr>
+
+                    <tr>
+                      <td class="detailsLabel">Début prévu projet : </td>
+                      <td>
+                        <p-datePicker formControlName="debutPrevu" dateFormat="yy-mm-dd"  />
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td class="detailsLabel">Début effectif du projet : </td>
+                      <td>
+                        <p-datePicker formControlName="debutEffectif" dateFormat="yy-mm-dd"  />
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td class="detailsLabel">Fin prévue du projet : </td>
+                      <td>
+                        <p-datePicker formControlName="finPrevue" dateFormat="yy-mm-dd"  />
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td class="detailsLabel">Fin effective du projet : </td>
+                      <td>
+                        <p-datePicker formControlName="finEffective" dateFormat="yy-mm-dd"  />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" class="text-end">
+                        <span class="text-danger">{{msg}}</span>
+                        <button
+                          (click)="saveProjet()"
+                          class="btn btn-outline-primary m-2">
+                          Enregistrer et continuer
+                          <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </ng-template>
+            </p-step-panel>
+            <p-step-panel [value]="2">
+              <ng-template #content let-activateCallback="activateCallback">
+                <div formArrayName="activites" class="mt-5">
+                  <div class="h5 m-2">
+                    Liste des activités du projet
+                    <i (click)="newActivite()"
+                       (keyup)="newActivite()"
+                       style="cursor: pointer"
+                       class="pi pi-plus-circle text-primary ms-2"></i>
+                  </div>
+                  <p-table showGridlines [value]="activites.value" [tableStyle]="{ 'min-width': '50rem' }">
+                    <ng-template #header>
+
+                      <tr>
+                        <th id="activite" class="enteteTab">Activité</th>
+                        <th id="porteur" class="enteteTab">Porteur</th>
+                        <th id="partenaires" class="enteteTab">Partenaires</th>
+                        <th id="debutPrevu" class="enteteTab">Début prévu activité</th>
+                        <th id="debutReel" class="enteteTab">Début effectif</th>
+                        <th id="finPrevue" class="enteteTab">Fin prévue activité</th>
+                        <th id="finReelle" class="enteteTab">Fin effective</th>
+                      </tr>
+                    </ng-template>
+                    <ng-template #body let-activite let-i="rowIndex">
+                      <tr>
+                        <td>
+                          {{activite.nom}}
+                        </td>
+                        <td>
+                          {{activite.porteur.nom}}
+                        </td>
+                        <td class="p-0">
+                          @for (p of activite.partenaires; track p; let iP = $index, isFirst = $first) {
+                            <div [class.border-top]="!isFirst">{{p.nom}}</div>
+                          }
+                        </td>
+                        <td>
+                          {{activite.debutPrevu}}
+                        </td>
+                        <td>
+                          {{activite.debutEffectif}}
+                        </td>
+                        <td>
+                          {{activite.finPrevue }}
+                        </td>
+                        <td>
+                          {{activite.finEffective}}
+                        </td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+
+                  <div class="d-flex justify-content-between mt-3">
+                    <button (click)="previousStep()" type="button" class="btn btn-outline-secondary">
+                      <i class="bi bi-arrow-left me-2"></i>
+                      Précédent
+                    </button>
+                    <button (click)="nextStep()" type="button" class="btn btn-outline-primary">
+                      Continuer
+                      <i class="bi bi-arrow-right ms-2"></i>
+                    </button>
+                  </div>
+                </div>
+              </ng-template>
+            </p-step-panel>
+            <p-step-panel [value]="3">
+              <ng-template #content let-activateCallback="activateCallback">
+
+                <span class="h4">Année :</span>
+                <p-select
+                  formControlName="annee"
+                  [options]="annees"
+                  style="width: 200px"
+                  (onChange)="updateEngagementYear()"
+                  placeholder="Choisir l'annee" class="h4" />
+                @if(chargementEngagement){
+                  <div>Chargement des taux de prévision et de réalisation</div>
+                }@else{
+                  <div formArrayName="exAntes" class="mt-5">
+                    <div class="h3 mt-3 border-bottom border-primary ">Ex-Ante (prévisions)</div>
+
+                    <table class="mt-4 mb-5">
+                      @for (exForm of exAntes.controls; let i = $index; track i) {
+                        <tr [formGroupName]="i">
+                          <th class="detailsLabel">Trimestres {{i+1}} :</th>
+                          <td>
+                            <input formControlName="taux"
+                                   [invalid]="exForm.touched && exForm.get('taux')?.invalid"
+                                   pInputText
+                                   pInputMask="9?99"
+                                   style="width: 86px; text-align: right"
+                                   placeholder="0 à 100"/> %
+                          </td>
+                          <td>
+                            <p-floatlabel class="ms-4"  variant="on" >
+                              <input style="min-width: 300px" pInputText id="comm_ant_{{i}}" fluid autocomplete="off" />
+                              <label for="comm_ant_{{i}}">Commentaires</label>
+                            </p-floatlabel>
+                          </td>
+                        </tr>
+                      }
+                    </table>
+
+                  </div>
+                  <div formArrayName="exPosts" class="mt-5">
+                    <div class="h3 mt-4 border-bottom border-primary">Ex-Post (Taux d'exécution)</div>
+                    <table class="mt-4 mb-2">
+                      @for (exForm of exPosts.controls; let i = $index; track i) {
+                        <tr [formGroupName]="i">
+                          <th class="detailsLabel pt-2">Trimestres {{i+1}} :</th>
+                          <td class="pt-2">
+                            <input formControlName="taux"
+                                   [invalid]="exForm.touched && exForm.get('taux')?.invalid"
+                                   pInputText
+                                   pInputMask="9?99"
+                                   style="width: 86px; text-align: right"
+                                   placeholder="0 à 100"/> %
+                          </td>
+                          <td>
+                            <p-floatlabel class="ms-4"  variant="on" >
+                              <input style="min-width: 300px" pInputText id="comm_post_{{i}}" fluid autocomplete="off" />
+                              <label for="comm_post_{{i}}">Commentaires</label>
+                            </p-floatlabel>
+                          </td>
+                        </tr>
+                      }
+                    </table>
+                  </div>
+                  <div class="p-3 border-top border-primary text-center">
+
+                    <button
+                      (click)="rechargementsEngagementFromApi()"
+                      [disabled]="projetForm.get('exAntes')?.pristine && projetForm.get('exPosts')?.pristine"
+                      type="button"
+                      class="btn btn-outline-danger">recharger les taux</button>
+                  </div>
+                }
+
+
+                <div class="d-flex justify-content-between mt-3">
+                  <button (click)="previousStep()" type="button" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Précédent
+                  </button>
+                  <button [disabled]="chargementEngagement || projetForm.get('exAntes')?.invalid || projetForm.get('exPosts')?.invalid"
+                          (click)="enregistrerAvancement()" type="button" class="btn btn-outline-primary">
+                    Continuer
+                    <i class="bi bi-arrow-right ms-2"></i>
+                  </button>
+                </div>
+              </ng-template>
+            </p-step-panel>
+            <p-step-panel [value]="4">
+              <ng-template #content let-activateCallback="activateCallback">
+                <div formArrayName="indicateurs">
+                  <div class="border-bottom">
+                  @for (indicForm of indicateurs.controls; let i = $index; track i) {
+                    <div [formGroupName]="i" class="form-check form-switch mb-3">
+                      <input formControlName="selected" class="form-check-input" type="checkbox" role="switch" id="switchCheckChecked{{i}}">
+                      <label class="form-check-label" for="switchCheckChecked{{i}}">{{indicForm.get('nom')?.value}}</label>
+                    </div>
+                  }
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between mt-3">
+                  <button (click)="previousStep()" type="button" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Précédent
+                  </button>
+                  <button [disabled]="chargementEngagement || projetForm.get('exAntes')?.invalid || projetForm.get('exPosts')?.invalid"
+                          (click)="enregistrerIndicateurs()" type="button" class="btn btn-outline-primary">
+                    Enregistrer et quitter
+                    <i class="bi bi-check-circle ms-2"></i>
+                  </button>
+                </div>
+              </ng-template>
+
+            </p-step-panel>
+          </p-step-panels>
+        </p-stepper>
+      </form>
+    </div>
+  } @else if (chargement) {
+    chargement projet
+  } @else{
+    <div>erreur {{msg}}</div>
+  }
+</div>
+
+
+
+<p-dialog [modal]="true" [(visible)]="editMode" [style]="{ width: '60rem'}">
+  <ng-template #header>
+    <div class="inline-flex items-center justify-center gap-2 h4 fw-bold">
+      @if(selectedActiviteForm.get('id')?.value ){
+        <span class="p-text-secondary block mb-8">Modification activité</span>
+      } @else {
+        <span class="p-text-secondary block mb-8">Ajout nouvelle activité</span>
+      }
+    </div>
+  </ng-template>
+
+  <form [formGroup]="selectedActiviteForm">
+    <div class="row">
+      <div class="col-12">
+        <p-floatlabel class="my-2" variant="on">
+          <textarea formControlName="activite" id="activiteSelected" pInputTextarea autocomplete="off" style="width: 100%;" ></textarea>
+          <label for="activiteSelected">Nom de l'activité</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-12">
+        <p-floatlabel class="mt-2 mb-0"  variant="on">
+          <p-autoComplete
+            id="porteurActiviteForm"
+            inputId="chips-combined"
+            [dropdown]="false"
+            formControlName="porteur"
+            [dataKey]="'id'"
+            [fluid]="true"
+            [optionLabel]="getPartenaireLabel"
+            [optionValue]="getPartenaireValue"
+            [suggestions]="filteredPartenaires"
+            (completeMethod)="searchPartenaire($event)"
+            [addOnBlur]="true"
+            [addOnTab]="true" ></p-autoComplete>
+          <label for="porteurActiviteForm">Porteur de l'activité</label>
+        </p-floatlabel>
+        <div class="small fst-italic mt-0 mb-2">utiliser la touche tabulation comme séparateur des partenaires</div>
+      </div>
+
+
+
+      <div class="col-12">
+        <p-floatlabel class="mt-2 mb-0"  variant="on">
+          <p-autoComplete
+            id="partenairesActiviteForm"
+            inputId="chips-combined"
+            [dropdown]="false"
+            formControlName="partenaires"
+            [dataKey]="'id'"
+            [fluid]="true"
+            [optionLabel]="getPartenaireLabel"
+            [optionValue]="getPartenaireValue"
+            [suggestions]="filteredPartenaires"
+            (completeMethod)="searchPartenaire($event)"
+            [addOnBlur]="true"
+            [multiple]="true"
+            [addOnTab]="true" ></p-autoComplete>
+          <label for="partenairesActiviteForm">Partenaires</label>
+        </p-floatlabel>
+        <div class="small fst-italic mt-0 mb-2">utiliser la touche tabulation comme séparateur des partenaires</div>
+      </div>
+
+      <div class="col-12">
+        <p-floatlabel class="mt-2 mb-0"  variant="on">
+          <p-autoComplete
+            id="resultatsAttendusForm"
+            inputId="chips-combined"
+            formControlName="resultatsAttendus"
+            multiple fluid [typeahead]="false"
+            [addOnBlur]="true"
+            [addOnTab]="true" ></p-autoComplete>
+          <label for="resultatsAttendusForm">Lister les résultats attendus</label>
+        </p-floatlabel>
+        <div class="small fst-italic mt-0 mb-4">utiliser la touche tabulation comme séparateur des résultats attendus</div>
+      </div>
+
+      <div class="col-6">
+        <p-floatlabel variant="on" class="my-2">
+          <p-datePicker
+            formControlName="debutPrevu"
+            inputId="debutPrevu"
+            showIcon iconDisplay="input" dateFormat="yy-mm-dd" />
+          <label for="debutPrevu">Début prévu de l'activité</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-6">
+        <p-floatlabel variant="on" class="my-2">
+          <p-datePicker
+            formControlName="debutEffectif"
+            inputId="debutEffectif" showIcon iconDisplay="input" dateFormat="yy-mm-dd" />
+          <label for="debutEffectif">Début réel de l’activité</label>
+        </p-floatlabel>
+      </div>
+      <div class="col-6">
+        <p-floatlabel variant="on" class="my-2">
+          <p-datePicker
+            formControlName="finPrevue"
+            inputId="finPrevue" showIcon iconDisplay="input" dateFormat="yy-mm-dd" />
+          <label for="finPrevue">Fin prévue de l'activité</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-6">
+        <p-floatlabel variant="on" class="my-2">
+          <p-datePicker
+            formControlName="finEffective"
+            inputId="finEffective" showIcon iconDisplay="input" dateFormat="yy-mm-dd" />
+          <label for="finEffective">Fin réelle de l’activité</label>
+        </p-floatlabel>
+      </div>
+    </div>
+  </form>
+
+  <div style="text-align: right" >
+    <button
+      class="btn btn-primary mt-3"
+      [disabled]="selectedActiviteForm.get('activite')?.invalid"
+      (click)="saveActivite()">Enregistrer</button>
+  </div>
+</p-dialog>

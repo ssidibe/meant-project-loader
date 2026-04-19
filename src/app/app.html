@@ -1,18 +1,17 @@
 <div class="layout">
 
   <!-- HEADER -->
-  <header class="shadow-sm ">
+  <header class="shadow-sm align-items-center">
 
     <button class="btn btn-light me-3"
             (click)="toggleSidebar()">
       <i class="bi bi-list"></i>
     </button>
-
-    <span class="fw-bold">
-      MEANT
+    <img ngSrc="/sn_flag.png" class="ms-2" alt="drapeau" height="25" width="37">
+    <span class="fw-bold text-primary h4 text-uppercase my-1 mx-2">
+      MEANT - Sénégal
     </span>
     <img src="/armoiries.png" alt="Logo" class="ms-auto" style="height:40px;">
-
   </header>
 
 
@@ -24,13 +23,13 @@
 
       <ul class="menu">
 
-        <li>
-          <a routerLink="/dashboard">
+        <li class="menu-item">
+          <a routerLink="/pilotage" routerLinkActive="activeMenuItem">
 
             <i class="bi bi-speedometer2"></i>
             @if (!collapsed){
               <span >
-                Dashboard
+                Pilotage
               </span>
             }
 
@@ -38,45 +37,45 @@
         </li>
 
         <li>
-          <a routerLink="/patients">
-
+          <a routerLink="/projets" routerLinkActive="activeMenuItem">
             <i class="bi bi-people"></i>
             @if (!collapsed){
-            <span >
-              Patients
+              <span >
+              Projets
             </span>
             }
-
           </a>
+        </li>
+        <li >
+          <a routerLink="/feuille-de-route" routerLinkActive="activeMenuItem" >
+            <img src="/images/contract-icon.svg" width="24x" alt="contrat"/>
+            @if (!collapsed){
+              <span >
+              Feuille de route
+            </span>
+            }</a>
         </li>
 
         <li>
-          <a routerLink="/rdv">
-
-            <i class="bi bi-calendar"></i>
-
+          <a routerLink="/users" routerLinkActive="activeMenuItem">
+            <i class="bi bi-people"></i>
             @if (!collapsed){
-            <span>
-              Rendez-vous
+            <span >
+              Utilisateurs
             </span>
             }
-
           </a>
         </li>
-
       </ul>
 
 
       <!-- USER FOOTER -->
       <div class="user-footer"
            (click)="openLogoutModal()">
-        <img src="assets/user.jpg"
-             class="user-avatar">
+        <span class="rounded-circle bg-secondary text-primary p-2">DS</span>
 
         @if (!collapsed) {
-        <span>
-          Dr. Samba SIDIBE
-        </span>
+        <span style="white-space: nowrap">Dr. Samba SIDIBE</span>
         }
 
       </div>
@@ -85,8 +84,8 @@
 
 
     <!-- CONTENT -->
-    <main class="content">
-      <router-outlet />
+    <main>
+        <router-outlet />
     </main>
 
   </div>

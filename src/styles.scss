@@ -1,4 +1,51 @@
 /* You can add global styles to this file, and also import other style files */
+@use "variables" as var;
+
 @use "bootstrap/scss/bootstrap" with (
-  $primary: green
+  $primary: var.$primary,
+  $secondary: var.$secondary,
 );
+
+:root {
+  color-scheme: light;
+}
+
+
+main {
+  flex: 1;
+  background: #f1f5f9;
+  overflow: auto;
+  @extend .p-2;
+  @extend .p-lg-4;
+}
+
+.headerRow{
+  @extend .text-primary;
+}
+
+.titrePage{
+  @extend .h3;
+  color: #2c2c2c;
+}
+
+.detailsValue{
+  text-align: left;
+}
+
+.detailsLabel{
+  @extend .detailsValue;
+  font-weight: bold;
+  text-align: right;
+  white-space: nowrap;
+}
+
+
+
+.menuSvgIcon{
+  color: blue;
+}
+
+.dashTitle{
+  @extend .text-primary;
+}
+

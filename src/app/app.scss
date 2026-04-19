@@ -1,3 +1,4 @@
+@use "../variables" as var;
 .layout {
   height: 100vh;
   display: flex;
@@ -22,13 +23,9 @@ header {
 /* MAIN */
 
 .main {
-
   display: flex;
-
   margin-top: 60px;
-
   height: calc(100vh - 60px);
-
 }
 
 
@@ -38,8 +35,7 @@ header {
 
   width: 230px;
 
-  //background: #1e293b;
-  background: #00401f;
+  background-color: var.$sideBarreColor;
 
   color: white;
 
@@ -49,35 +45,37 @@ header {
 
   justify-content: space-between;
 
-  transition: width 0.3s;
+  transition: width 0.5s;
 }
 
 .sidebar.collapsed {
   width: 70px;
 }
 
-
-/* MENU */
-
 .menu {
   list-style: none;
   padding: 0;
   margin: 0;
+  i{
+    width: 20px;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.8);
+    transition: color 0.3s ease;
+  }
+  a {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    color: white;
+    text-decoration: none;
+    &:hover {
+      font-weight: bolder;
+    }
+  }
 }
 
-.menu li a {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 15px;
-  color: white;
-  text-decoration: none;
-}
 
-.menu li a:hover {
-  //background: #334155;
-  background: #009858;
-}
 
 
 /* USER */
@@ -98,18 +96,13 @@ header {
 }
 
 
-/* CONTENT */
-
-.content {
-
-  flex: 1;
-
-  padding: 25px;
-
-  background: #f1f5f9;
-
-  overflow: auto;
-
+.activeMenuItem{
+  background-color: var.$selectedMenuColor;
+  border-left: 3px solid #ffa500;
+  font-weight: bolder;
+  &:hover{
+    cursor: default;
+  }
 }
 
 

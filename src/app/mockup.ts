@@ -1,4 +1,4 @@
-import { User } from './app.models';
+import { User } from './domain.models';
 
 
 export const USERS:User[] = [

@@ -30,9 +30,12 @@
                 "input": "public"
               }
             ],
-            "styles": ["node_modules/bootstrap-icons/font/bootstrap-icons.scss", "src/styles.scss"],
+            "styles": ["node_modules/primeicons/primeicons.css", "node_modules/bootstrap-icons/font/bootstrap-icons.scss", "src/styles.scss"],
 
-            "scripts": ["node_modules/bootstrap/dist/js/bootstrap.bundle.js"]
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.js",
+              "node_modules/apexcharts/dist/apexcharts.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -66,6 +69,10 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "port": 8001,
+            "host": "project-loader.meantsn2050.com"
+          },
           "configurations": {
             "production": {
               "buildTarget": "meant-project-loader:build:production"

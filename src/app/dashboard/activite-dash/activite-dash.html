@@ -1,0 +1,22 @@
+<p-tabs lazy value="0">
+  <p-tablist>
+    <p-tab value="0">Taux de remplissage des formulaires</p-tab>
+    <p-tab value="1">En cours</p-tab>
+    <p-tab value="2">Retard démarrage</p-tab>
+    <p-tab value="3">Retard fin activité</p-tab>
+  </p-tablist>
+  <p-tabpanels>
+    <p-tabpanel value="0">
+      <div class="row">
+        <div class="col-12">
+          <div class="border rounded-2 p-2">
+          <div class="text-dark h3">
+            Taux d'activité conforme {{remplissage?.nbAllChampsOK}}/{{remplissage?.nbActivite}}
+          </div>
+          </div>
+        </div>
+      </div>
+
+    </p-tabpanel>
+  </p-tabpanels>
+</p-tabs>

@@ -1,0 +1,65 @@
+<div class="bg-white rounded-2 p-2">
+  <div class="titrePage">Feuille de route des projets</div>
+  <div class="text-danger">{{errMsg}}</div>
+
+  <p-table class="meantTable" [scrollable]="true"
+    #dataTable
+    showGridlines
+    [columns]="selectedColumns"
+    [value]="listView.projets"
+    [loading]="chargementList"
+    [rows]="rows"
+    [first]="first"
+    (onPage)="pageChange($event)"
+    dataKey="id">
+    <ng-template #caption>
+      <p-multiSelect display="chip" [options]="colonnes" [(ngModel)]="selectedColumns" optionLabel="entete" selectedItemsLabel="{0} columns selected" [style]="{ 'min-width': '200px' }" placeholder="Choose Columns" />
+    </ng-template>
+    <ng-template pTemplate #header let-columns>
+      <tr>
+        @for (col of columns; track col.entete; let index=$index) {
+          <th class="entete" id="col_{{index}}"  >
+            <span>{{col.entete}}</span><br/>
+            @if (col.searchTxt){
+              <p-columnFilter
+                type="text"
+                field="{{col.champ}}"
+                matchMode="contains"
+                placeholder="{{col.searchTxt}}"
+                ariaLabel="Filter"
+                [showMenu]="false"
+                filterOn="input">
+              </p-columnFilter>
+            }
+          </th>
+        }
+      </tr>
+    </ng-template>
+    <ng-template pTemplate  #body let-projet let-rowIndex="rowIndex">
+      <tr
+        [class.selectedRow]="projet.id===selectedProjet?.id"
+        [class.paire]="rowIndex%2==0"
+        [class.ko]="(projet.debutEffectif || projet.debutPrevu || projet.finPrevue || projet.finEffective) && !(projet.debutEffectif && projet.debutPrevu && projet.finPrevue && projet.finEffective)"
+        [class.ok]="projet.debutEffectif && projet.debutPrevu && projet.finPrevue && projet.finEffective"
+        (dblclick)="detailsProjet(projet.id)"
+        (keyup)="detailsProjet(projet.id)"
+        (click)="selectProjet(projet)">
+        @for (col of selectedColumns; track col.champ) {
+            <td>
+              {{ getNestedValue(projet,col.champ) }}
+            </td>
+          }
+
+    </ng-template>
+
+    <ng-template pTemplate #loadingbody>
+      @for (item of [].constructor(6); track $index) {
+        <tr id="sket{{item}}">
+          @for (col of colonnes; track col.champ) {
+            <td><p-skeleton [height]="skeletonHeight" /></td>
+          }
+        </tr>
+      }
+    </ng-template>
+  </p-table>
+</div>

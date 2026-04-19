@@ -1,1 +1,52 @@
-<p>projets-list works!</p>
+<div class="bg-white p-2">
+  <div class="titrePage h2 border-bottom border-primary">Listes des projets stratégiques</div>
+  <p-table [value]="projetsView.projets" [tableStyle]="{ 'min-width': '50rem' }">
+    <ng-template #header>
+      <tr>
+        <th class="border-end enteteTab" rowspan="2">Axe</th>
+        <th class="border-end enteteTab" rowspan="2">Objectif Stratégique</th>
+        <th class="border-end enteteTab" colspan="2">Programme</th>
+        <th class="border-end enteteTab" colspan="3">Projet</th>
+
+      </tr>
+      <tr>
+        <th class="border-end enteteTab">Porteur(s)</th>
+        <th class="border-end enteteTab">Nom</th>
+        <th class="border-end enteteTab">N°</th>
+        <th class="border-end enteteTab">Porteur(s)</th>
+        <th class="border-end enteteTab">Nom</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-rowIndex="rowIndex" let-projet>
+      <tr [class.ligneTablePaire]="rowIndex % 2==1" [class.ligneTableImpPaire]="rowIndex%2==0" (dblclick)="voirDetails(projet.projetId)">
+        <td class="border-end">
+          @if (projet.axe){
+            {{projet.axe.nom}}
+          }
+        </td>
+        <td class="border-end">
+          @if (projet.os) {
+            {{projet.os.nom}}
+          }
+        </td>
+        <td class="border-end">
+          @for (porteur of projet.porteursProgrammeData; track porteur.id) {
+            <span [pTooltip]="porteur.nom">{{porteur.code}}</span>
+          }
+        </td>
+        <td class="border-end">
+          @if (projet.programme) {
+            <span>{{projet.programme.nom}}</span>
+          }
+        </td>
+        <td class="border-end">
+          {{ projet.numero }}
+        </td>
+        <td class="border-end">
+          {{projet.porteur}}
+        </td>
+        <td class="border-end">{{ projet.nom }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

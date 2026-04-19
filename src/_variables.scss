@@ -1,0 +1,32 @@
+$primary: #007b3d;
+/**$secondary: rgb(230,198,2)**/;
+$secondary: #ffa500;
+$sideBarreColor: $primary;
+//$selectedMenuColor: #003f1e;
+$selectedMenuColor: #005024;
+
+
+$table-border-color: #e0e0e0;
+$table-header-bg: $primary;
+$table-header-text: white;
+$table-row-hover: rgba($primary, 0.05);
+$table-striped-bg: rgba($primary, 0.02);
+$table-selected-bg: rgba($selectedMenuColor, 0.1);
+$table-font-size: 14px;
+
+.meantTable{
+  width: 100%;
+  font-size: $table-font-size;
+  .entete {
+    background-color: var(--p-gray-300);
+  }
+  .paire{
+    background-color: var(--p-gray-100);
+  }
+  .selectedRow{
+    background-color: lighten($selectedMenuColor, 78%);
+  }
+  td{
+    cursor: pointer;
+  }
+}

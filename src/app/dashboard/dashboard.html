@@ -1,1 +1,40 @@
-<p>dashboard works!</p>
+<div class="card p-2">
+  <div class="titrePage">Tableau de bord</div>
+  <div class="cardi">
+    <p-tabs lazy value="0">
+      <p-tablist>
+        <p-tab value="0">Activités</p-tab>
+        <p-tab value="1">Projets</p-tab>
+        <p-tab value="2">Programmes</p-tab>
+        <p-tab value="3">Objectifs stratégiques</p-tab>
+        <p-tab value="4">Axes stratégiques</p-tab>
+      </p-tablist>
+      <p-tabpanels>
+        <p-tabpanel value="0">
+          <p class="m-0">
+            <app-activite-dash></app-activite-dash>
+          </p>
+        </p-tabpanel>
+
+        <p-tabpanel value="1">
+          <p class="m-0">
+            <app-projet-dash></app-projet-dash>
+          </p>
+        </p-tabpanel>
+
+        <p-tabpanel value="2">
+          <app-programme-dash></app-programme-dash>
+        </p-tabpanel>
+
+        <p-tabpanel value="3">
+          <app-os-dash></app-os-dash>
+        </p-tabpanel>
+
+        <p-tabpanel value="4">
+          <app-axe-dash></app-axe-dash>
+        </p-tabpanel>
+
+      </p-tabpanels>
+    </p-tabs>
+  </div>
+</div>
