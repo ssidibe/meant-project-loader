@@ -42,8 +42,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "3MB",
+                  "maximumError": "3MB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -71,7 +71,7 @@
           "builder": "@angular/build:dev-server",
           "options": {
             "port": 8001,
-            "host": "project-loader.meantsn2050.com"
+            "host": "feuille-de-route.meantsn2050.com"
           },
           "configurations": {
             "production": {
