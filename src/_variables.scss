@@ -13,7 +13,7 @@ $table-row-hover: rgba($primary, 0.05);
 $table-striped-bg: rgba($primary, 0.02);
 $table-selected-bg: rgba($selectedMenuColor, 0.1);
 $table-font-size: 14px;
-
+$bgErrorRow:#f8d7da;
 .meantTable{
   width: 100%;
   font-size: $table-font-size;
@@ -30,3 +30,5 @@ $table-font-size: 14px;
     cursor: pointer;
   }
 }
+
+

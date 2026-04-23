@@ -11,14 +11,16 @@ import { Os } from './pilotage/os/os';
 import { Programmes } from './pilotage/programmes/programmes';
 import { Projets } from './pilotage/projets/projets';
 import { Indicateurs } from './pilotage/indicateurs/indicateurs';
+import { ProjetsFiche } from './projets-fiche/projets-fiche';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'projets', pathMatch: 'full' },
-  { path: 'projets', component: ProjetsList },
-  { path: 'projets/:numero', component: ProjetsDetail },
   { path: 'feuille-de-route', component: ProjetEngagement },
   { path: 'feuille-de-route/:id', component: ProjetEngagementDetails },
   { path: 'projets/:numero/edit', component: ProjetsEdit },
+  { path: 'projets/list', component: ProjetsList },
+  { path: 'projets/fiches', component: ProjetsFiche },
+  { path: 'projets/:numero', component: ProjetsDetail },
   {
     path: 'pilotage',
     component: Pilotage,
@@ -29,7 +31,7 @@ export const routes: Routes = [
       { path: 'programmes', component: Programmes },
       { path: 'projets', component: Projets },
       { path: 'indicateurs', component: Indicateurs },
-    ]
+    ],
   },
 
   { path: '**', component: EnConstruction },

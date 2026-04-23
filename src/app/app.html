@@ -25,19 +25,17 @@
 
         <li class="menu-item">
           <a routerLink="/pilotage" routerLinkActive="activeMenuItem">
-
             <i class="bi bi-speedometer2"></i>
             @if (!collapsed){
               <span >
                 Pilotage
               </span>
             }
-
           </a>
         </li>
 
         <li>
-          <a routerLink="/projets" routerLinkActive="activeMenuItem">
+          <a routerLink="/projets/list" routerLinkActive="activeMenuItem">
             <i class="bi bi-people"></i>
             @if (!collapsed){
               <span >
@@ -46,9 +44,22 @@
             }
           </a>
         </li>
-        <li >
+        <li>
+          <a routerLink="/projets/fiches" routerLinkActive="activeMenuItem">
+            <i class="bi bi-file-earmark-pdf"></i>
+            @if (!collapsed){
+              <span >
+              Fiches Projet
+            </span>
+            }
+          </a>
+        </li>
+        <li>
+
+        <li>
           <a routerLink="/feuille-de-route" routerLinkActive="activeMenuItem" >
-            <img src="/images/contract-icon.svg" width="24x" alt="contrat"/>
+            <!--img src="/images/contract-icon.svg" width="24x" alt="contrat"/-->
+            <i class="bi bi-pin-angle"></i>
             @if (!collapsed){
               <span >
               Feuille de route

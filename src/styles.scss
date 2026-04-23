@@ -40,7 +40,6 @@ main {
 }
 
 
-
 .menuSvgIcon{
   color: blue;
 }
@@ -48,4 +47,14 @@ main {
 .dashTitle{
   @extend .text-primary;
 }
+.paire{
+  background-color: var(--p-gray-100);
+}
 
+.rowError{
+  background-color: var.$bgErrorRow;
+}
+
+.rowSelected{
+  background-color: #d4edda;
+}

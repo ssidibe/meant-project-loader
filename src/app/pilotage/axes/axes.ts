@@ -36,22 +36,22 @@ export class Axes {
   public chartOptions: Partial<ChartOptions> = {
     series: [
       {
-        name: 'Q1 Budget',
+        name: 'Data 1',
         group: 'budget',
         data: [44000, 55000, 41000, 67000, 22000, 43000],
       },
       {
-        name: 'Q2 Budget',
+        name: 'Data 2',
         group: 'budget',
         data: [13000, 36000, 20000, 8000, 13000, 27000],
       },
       {
-        name: 'Q1 Actual',
+        name: 'Data 3',
         group: 'actual',
         data: [48000, 50000, 40000, 65000, 25000, 40000],
       },
       {
-        name: 'Q2 Actual',
+        name: 'Data 4',
         group: 'actual',
         data: [20000, 40000, 25000, 10000, 12000, 28000],
       },
@@ -77,12 +77,12 @@ export class Axes {
     },
     xaxis: {
       categories: [
-        'Online advertising',
-        'Sales Training',
-        'Print advertising',
-        'Catalogs',
-        'Meetings',
-        'Public relations',
+        'Ministere 1',
+        'Ministere 2',
+        'Ministere 3',
+        'Ministere 3',
+        'Ministere 4',
+        'Ministere 4',
       ],
     },
     fill: {

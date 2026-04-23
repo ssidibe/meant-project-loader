@@ -1,0 +1,27 @@
+@if(projet){
+  <div
+    [class.rowSelected]="selected"
+    [class.rowError]="!(selected || projet.fichier)"
+    [class.paire]="!selected && even && projet.fichier"
+       (click)="onSelect()" (keydown)="onSelect()"
+       class="m-2 card rounded-4 p-3">
+    <table class="formTable">
+      <thead>
+      <tr>
+        <td colspan="2">
+          <div class="h6 fw-bold">{{projet.nom}}</div>
+        </td>
+      </tr>
+      </thead>
+      <tr>
+        <th id="nomAxe" class="detailsLabel fw-normal">Axe : </th>
+        <td>{{ projet.axe?.nom }}</td>
+      </tr>
+      <tr>
+        <th id="nomOs" class="detailsLabel fw-normal">OS : </th>
+        <td>{{ projet.os?.nom }}</td>
+      </tr>
+    </table>
+
+  </div>
+}

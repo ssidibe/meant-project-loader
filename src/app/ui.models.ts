@@ -1,9 +1,29 @@
 import { Axe, Structure } from './domain.models';
 
+
+export interface FicheProjetDto{
+  id?:number;
+  nomFicheProjet:string;
+  dateAjout?:string;
+  tailleFichier:number;
+  projetId:number;
+}
 export interface EntiteGouvListRowViewDto {
   id: number;
   code: string;
   nom: string;
+}
+
+export interface AxeDto {
+  numero: number;
+  nom: string;
+  id: number;
+}
+
+export interface OsDto {
+  id: number;
+  nom: string;
+  axeId: number;
 }
 
 export interface ProjetDto {
@@ -24,8 +44,10 @@ export interface ProjetDto {
   porteur3?: EntiteGouvListRowViewDto;
 
   programme?: ProgrammeDto;
-  os?: OsListRowViewDto;
-  axe?: Axe;
+  os?: OsDto;
+  axe?: AxeDto;
+  fichier?: FicheProjetDto;
+  nbHistoriquesFiche?: number;
 }
 
 export interface ProgrammeDto {
@@ -48,8 +70,8 @@ export interface ProjetListView {
   projets: ProjetDto[];
   programmes: ProgrammeDto[];
   entities: EntiteGouvListRowViewDto[];
-  objectifs: OsListRowViewDto[];
-  axes: Axe[];
+  objectifs: OsDto[];
+  axes: AxeDto[];
 }
 
 export interface ActiviteDto {
