@@ -1,0 +1,14 @@
+<div class="bg-white rounded-2 p-2">
+  <div class="titrePage">Liste des utilisateurs</div>
+  <div class="text-danger">{{errMsg}}</div>
+
+  <p-table
+    class="meantTable"
+    dataKey="id"
+    [value]="users">
+    <ng-template #caption>
+      <p-multiSelect display="chip" [options]="colonnes" [(ngModel)]="selectedColumns" optionLabel="entete" selectedItemsLabel="{0} columns selected" [style]="{ 'min-width': '200px' }" placeholder="Choose Columns" />
+    </ng-template>
+
+  </p-table>
+</div>

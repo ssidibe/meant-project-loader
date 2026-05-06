@@ -12,10 +12,12 @@ import { Programmes } from './pilotage/programmes/programmes';
 import { Projets } from './pilotage/projets/projets';
 import { Indicateurs } from './pilotage/indicateurs/indicateurs';
 import { ProjetsFiche } from './projets-fiche/projets-fiche';
+import { UsersList } from './users/users-list/users-list';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'projets', pathMatch: 'full' },
   { path: 'feuille-de-route', component: ProjetEngagement },
+  { path: 'users', component: UsersList},
   { path: 'feuille-de-route/:id', component: ProjetEngagementDetails },
   { path: 'projets/:numero/edit', component: ProjetsEdit },
   { path: 'projets/list', component: ProjetsList },

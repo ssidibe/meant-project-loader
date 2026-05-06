@@ -14,6 +14,10 @@ export interface EntiteGouvListRowViewDto {
   nom: string;
 }
 
+export interface IndicateursViewDto{
+
+}
+
 export interface AxeDto {
   numero: number;
   nom: string;
@@ -24,6 +28,36 @@ export interface OsDto {
   id: number;
   nom: string;
   axeId: number;
+}
+
+export interface EngagePopuDto{
+  id: number;
+  nom: string;
+  selected:boolean;
+  loading:true
+}
+export interface DomainePrioDto {
+  id: number;
+  nom: string;
+  selected: boolean;
+  loading: true;
+}
+
+
+export interface FocusDto {
+  id: number;
+  nom: string;
+  cibleId: number;
+  domainePrioId: number;
+  selected: boolean;
+  loading: true;
+}
+
+export interface IndicateurDto {
+  id: number;
+  nom: string;
+  focusId: number;
+  selected: boolean;
 }
 
 export interface ProjetDto {
@@ -132,4 +166,26 @@ export interface AvancementProjetAnnuelDto {
   t2Post: number|null;
   t3Post: number|null;
   t4Post: number|null;
+}
+
+export interface ToastMsg {
+  severity: string;
+  summary: string;
+  detail: string;
+  life: number;
+}
+
+export interface Cible {
+  id: number;
+  nom: string;
+  ordre: number;
+}
+
+export interface ProjetFinanceDto {
+  projetId: number;
+  envTotale: number;
+  finePublic: number;
+  fineHorsBudget: number;
+  maturite: number;
+  cibles:string[];
 }

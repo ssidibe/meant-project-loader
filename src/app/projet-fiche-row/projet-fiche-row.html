@@ -1,10 +1,10 @@
 @if(projet){
   <div
+    [class.rowError]="!projet.fichier"
     [class.rowSelected]="selected"
-    [class.rowError]="!(selected || projet.fichier)"
     [class.paire]="!selected && even && projet.fichier"
-       (click)="onSelect()" (keydown)="onSelect()"
-       class="m-2 card rounded-4 p-3">
+    (click)="onSelectProjet()" (keydown)="onSelectProjet()"
+    class="m-2 card rounded-4 p-3">
     <table class="formTable">
       <thead>
       <tr>
@@ -21,7 +21,99 @@
         <th id="nomOs" class="detailsLabel fw-normal">OS : </th>
         <td>{{ projet.os?.nom }}</td>
       </tr>
+      <tr>
+        <th  class="detailsLabel fw-normal">Porteur : </th>
+        <td>{{ projet.porteur?.code }}</td>
+      </tr>
+      @if (projet.fichier) {
+        <tr >
+          <th id="nomOs" class="detailsLabel fw-normal">
+            @if (projet.fichier.nomFicheProjet.toLowerCase().endsWith('.pdf')){
+              <a target="_blank" href="http://127.0.0.1:8080/engagements/projets/fiches/{{projet.fichier?.id}}">
+                <img src="/images/PDF_file_icon.svg" alt="PDF"  height="40" width="30" >
+              </a>
+            }
+          </th>
+          <td>
+            {{ projet.fichier.nomFicheProjet }}<br/>
+            {{ formatSize(projet.fichier.tailleFichier)  }}<br/>
+            {{ projet.fichier.dateAjout| date : "dd-MM-yyyy 'à' H'h':mm'mn'"}}<br/>
+          </td>
+        </tr>
+      }
     </table>
+    @if (selected) {
+      <div class="card">
+        <p-fileupload
+          [customUpload]="true"
+          [multiple]="false" accept=".pdf,.doc,.docx,application/pdf" maxFileSize="10000000"
+          (onSelect)="onSelectedFile($event)">
+          <ng-template #header let-files let-chooseCallback="chooseCallback" let-clearCallback="clearCallback" let-uploadCallback="uploadCallback">
+            <table style="width: 100%">
+              <tr>
+                <th>
+                  <p-progress-bar [value]="progression" class="md:w-20rem h-1 w-full md:ml-auto" style="height: 20px"></p-progress-bar>
+                </th>
+              </tr>
+              <tr>
+                <td class="p-2">
+                  @if(ficheProjet){
+                    <div style="cursor: pointer" (click)="effacer(clearCallback)" (keydown)="effacer(clearCallback)">
+                      <p-button
+                        icon="pi pi-times" [severity]="'danger'"
+                        [rounded]="true"
+                        [outlined]="true" /> <span class="text-danger"> annuler la sélection</span>
+                    </div>
+                  } @else {
+                    <p-button
+                      (onClick)="chooseCallback()" icon="pi pi-cloud-upload"
+                      [rounded]="true"
+                      [outlined]="true" />
+                    @if (projet.fichier) {
+                      <span> Remplacer le fichier</span>
+                    } @else {
+                      <span> Charger un fichier</span>
+                    }
+                  }
+                </td>
+                </tr>
+            </table>
+          </ng-template>
+          <ng-template #content
+                       let-files
+                       let-clearCallback="clearCallback"
+                       let-uploadedFiles="uploadedFiles"
+                       let-removeFileCallback="removeFileCallback"
+                       let-removeUploadedFileCallback="removeUploadedFileCallback">
+            @for (fichier of files; track $index){
+              <table style="width: 0px">
+                <tr>
+                  <td>
+                    @if (fichier.name.toLowerCase().endsWith('.pdf')) {
+                      <img src="/images/PDF_file_icon.svg" alt="PDF"  height="200" width="150" >
+                    } @else if (fichier.name.toLowerCase().endsWith('.docx')|| fichier.name.toLowerCase().endsWith('.doc')){
+                      <img src="/images/DOCX.png" alt="word" height="200" width="150" >
+                    }
+                  </td>
+                  <td class="p-2">
+                    <span class="detailsLabel">Nom fichier :</span>
+                    <span class="detailsValue text-nowrap">{{fichier.name}}</span><br/>
 
+                    <span class="detailsLabel">Taille :</span>
+                    <span class="detailsValue">{{formatSize(fichier.size)}}</span><br/>
+                    <button (click)="uploadFile(clearCallback)" class="btn btn-primary mt-3">
+                      <i class="pi pi-cloud-upload"></i>
+                      Envoyer</button>
+                  </td>
+                </tr>
+              </table>
+
+            }
+          </ng-template>
+          <ng-template #file let-file></ng-template>
+
+        </p-fileupload>
+      </div>
+    }
   </div>
 }

@@ -1,14 +1,23 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ActiviteDto, AvancementProjetDto, ProjetListView } from '../ui.models';
+import {
+  ActiviteDto,
+  AvancementProjetDto, Cible,
+  DomainePrioDto,
+  EngagePopuDto,
+  FicheProjetDto,
+  FocusDto, IndicateurDto, ProjetFinanceDto,
+  ProjetListView
+} from '../ui.models';
 import { EngagementProjetDto, Structure } from '../domain.models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EngagementService {
+  coreBaseUrl = `${environment.API.BASE_URL}/${environment.API.SERVICES.CORE}`;
   engagementBaseUrl = `${environment.API.BASE_URL}/${environment.API.SERVICES.ENGAGEMENTS}`;
   projetBaseUrl = `${this.engagementBaseUrl}/projets`;
   constructor(private readonly httpClient: HttpClient) {}
@@ -66,5 +75,44 @@ export class EngagementService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     console.log('enregistrement indicateurs', projetId, indicateurs);
     return this.httpClient.put<void>(url, indicateurs, { headers: headers });
+  }
+
+  uploadFicheProjet(projetId: number, ficheProjet: File): Observable<HttpEvent<FicheProjetDto>> {
+    const url = `${this.projetBaseUrl}/${projetId}/fiche-projet/upload`;
+    console.log('envoi du fichier url', url);
+    const formData = new FormData();
+    formData.append('ficheProjet', ficheProjet);
+    return this.httpClient.post<FicheProjetDto>(url, formData, {
+      reportProgress: true,
+      observe: 'events',
+    });
+  }
+
+  getEngagesPopu(): Observable<EngagePopuDto[]> {
+    const url = `${this.coreBaseUrl}/indicateurs/engages-popu`;
+    return this.httpClient.get<EngagePopuDto[]>(url);
+  }
+
+  getDomainesPrioritaires(engagePopuDto: EngagePopuDto): Observable<DomainePrioDto[]> {
+    const url = `${this.coreBaseUrl}/indicateurs/engages-popu/${engagePopuDto.id}/domaines-prio`;
+    return this.httpClient.get<DomainePrioDto[]>(url);
+  }
+
+  getFocusList(domaine: DomainePrioDto): Observable<FocusDto[]> {
+    const url = `${this.coreBaseUrl}/indicateurs/domaines-prio/${domaine.id}/focus`;
+    return this.httpClient.get<FocusDto[]>(url);
+  }
+
+  getIndicateursByFocus(focusDto: FocusDto): Observable<IndicateurDto[]> {
+    const url = `${this.coreBaseUrl}/indicateurs/focus/${focusDto.id}/indicateurs`;
+    return this.httpClient.get<IndicateurDto[]>(url);
+  }
+
+
+  saveFinances(finances: ProjetFinanceDto):Observable<void> {
+    const url = `${this.projetBaseUrl}/${finances.projetId}/finances`;
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    console.log('enregistrement finance', finances);
+    return this.httpClient.put<void>(url, finances, { headers: headers });
   }
 }

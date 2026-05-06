@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { EngagementProjetDto, Indicateur, ProjetDto } from '../domain.models';
+import { HttpClient } from '@angular/common/http';
+import { Indicateur, ProjetDto } from '../domain.models';
 import { ProjetListView } from '../ui.models';
-import { Indicateurs } from '../pilotage/indicateurs/indicateurs';
-import { ProjetEngagement } from '../projet-engagement/projet-engagement';
 
 @Injectable({
   providedIn: 'root',

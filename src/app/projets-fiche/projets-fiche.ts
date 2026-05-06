@@ -11,12 +11,12 @@ import { ProjetFicheRow } from '../projet-fiche-row/projet-fiche-row';
   selector: 'app-projets-fiche',
   templateUrl: './projets-fiche.html',
   styleUrl: './projets-fiche.scss',
-  imports: [Skeleton, JsonPipe, ProjetFicheRow],
+  imports: [Skeleton, ProjetFicheRow],
 })
 export class ProjetsFiche implements OnInit {
   errMsg: string = '';
   loading: boolean = false;
-  selectedProjet: ProjetDto |undefined;
+  selectedProjet: ProjetDto | undefined;
   listView: ProjetListView = {
     axes: [],
     projets: [],
@@ -85,4 +85,6 @@ export class ProjetsFiche implements OnInit {
   onProjetSelectionne(projet: ProjetDto) {
     this.selectedProjet = projet;
   }
+
+
 }

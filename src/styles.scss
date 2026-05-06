@@ -52,9 +52,16 @@ main {
 }
 
 .rowError{
+  @extend .border-5;
+  @extend .border-end-0;
+  @extend .border-top-0;
+  @extend .border-bottom-0;
+  @extend .border-danger;
   background-color: var.$bgErrorRow;
 }
 
 .rowSelected{
-  background-color: #d4edda;
+  @extend .border-end;
+  @extend .border-5;
+  @extend .border-dark;
 }

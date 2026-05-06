@@ -1,10 +1,13 @@
 
-export interface User{
-  titre?: string;
+export interface User {
+  id?:number;
+  titre: string;
   prenom: string;
   nom: string;
   email: string;
-  roles:string[];
+  telephone?: string;
+  roles: string[];
+  structures: string[];
 }
 
 export interface ProjetDto {
@@ -56,6 +59,11 @@ export interface EngagementProjetDto {
   finPrevue?: string;
   finEffective?: string;
   creePar?: string;
+  enveloppe?: number;
+  financementPublic?: number;
+  financementHorsBudget?: number;
+  maturite?: string;
+  cibles?: string[];
   actions: Action[];
   axe?: string;
   os?: string;

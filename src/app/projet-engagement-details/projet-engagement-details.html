@@ -1,3 +1,4 @@
+
 <div class="bg-white p-4 rounded-4">
   @if (engagementProjet){
     <div class="h4 text-center">
@@ -12,8 +13,10 @@
           <p-step-list>
             <p-step [value]="1">Jalons Projet</p-step>
             <p-step [value]="2">Activités</p-step>
-            <p-step [value]="3">Prévisions & Avancements</p-step>
+            <p-step [value]="3">Etat d’avancement</p-step>
             <p-step [value]="4">Indicateurs de pilotage</p-step>
+            <p-step [value]="5">Financement</p-step>
+            <p-step [value]="6">Récapitulation fiche projet</p-step>
           </p-step-list>
           <p-step-panels>
             <p-step-panel [value]="1">
@@ -257,18 +260,180 @@
                 </div>
               </ng-template>
             </p-step-panel>
+
             <p-step-panel [value]="4">
               <ng-template #content let-activateCallback="activateCallback">
-                <div formArrayName="indicateurs">
+
+                <div class="mb-3" >
+                  <div class="fw-bold h4 text-primary mb-0">Cochez les indicateurs que votre projet contribue à améliorer</div>
+                  <div class="fst-italic text-danger mt-0">Vous pouvez en sélectionner plusieurs</div>
+                </div>
+                <div formArrayName="engagementsPopu">
                   <div class="border-bottom">
-                  @for (indicForm of indicateurs.controls; let i = $index; track i) {
-                    <div [formGroupName]="i" class="form-check form-switch mb-3">
-                      <input formControlName="selected" class="form-check-input" type="checkbox" role="switch" id="switchCheckChecked{{i}}">
-                      <label class="form-check-label" for="switchCheckChecked{{i}}">{{indicForm.get('nom')?.value}}</label>
-                    </div>
-                  }
+                    @for (epForm of engagesPopu.controls; let epI = $index; track epI){
+                      <div [formGroupName]="epI">
+                        <div role="button" class="fw-bold " (click)="onClickEngagPop(epI)">
+                          <i class="bi "
+                             [class.bi-caret-right-fill]="!epForm.get('expanded')?.value"
+                             [class.bi-caret-down-fill]="epForm.get('expanded')?.value"></i>
+                          <span>{{epForm.get('nom')?.value}}</span>
+                        </div>
+
+                        @if (epForm.get('expanded')?.value) {
+                          <div formArrayName="domaines" >
+                            @for (domainForm of getDomainesPrioritaires(epI).controls ; let domI = $index; track domI){
+                              <div [formGroupName]="domI">
+                                <div (click)="onClickDomainePrio(epI,domI)" role="button" class="ms-4">
+                                  <i class="bi "
+                                     [class.bi-caret-right-fill]="!domainForm.get('expanded')?.value"
+                                     [class.bi-caret-down-fill]="domainForm.get('expanded')?.value"></i>
+                                  <span>{{domainForm.get('nom')?.value}}</span>
+                                </div>
+
+                                @if (domainForm.get('expanded')?.value){
+                                  <div formArrayName="focusList">
+                                    @for (focusForm of getFocusForm(epI,domI).controls ; let focI = $index; track focI){
+                                      <div [formGroupName]="focI" class="ps-4">
+
+                                        <div role="button" class="ms-4" (click)="onClickFocus(epI,domI,focI)">
+                                          <i class="bi "
+                                             [class.bi-caret-right-fill]="!focusForm.get('expanded')?.value"
+                                             [class.bi-caret-down-fill]="focusForm.get('expanded')?.value"></i>
+                                          <span>{{focusForm.get('nom')?.value}}</span>
+                                        </div>
+
+                                        @if (focusForm.get('expanded')?.value){
+                                          <div formArrayName="indicateurs">
+                                            @for (indicForm of getIndicForm(epI,domI,focI).controls ; let indicI = $index; track indicI){
+                                              <div [formGroupName]="indicI" class="ps-4">
+                                                <div class="form-check form-switch mb-3 ms-4">
+                                                  <input
+                                                    formControlName="selected"
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    role="switch" id="focChecked{{epI}}{{domI}}{{focI}}{{indicI}}">
+                                                  <label class="form-check-label" for="focChecked{{epI}}{{domI}}{{focI}}{{indicI}}">{{indicForm.get('nom')?.value}}</label>
+                                                </div>
+                                              </div>
+
+                                            }
+
+                                          </div>
+                                        }
+
+
+                                      </div>
+                                    }
+                                  </div>
+                                }
+                              </div>
+                            }
+                          </div>
+                        }
+
+                      </div>
+                    }
                   </div>
                 </div>
+                <div class="d-flex justify-content-between mt-3">
+                  <button (click)="previousStep()" type="button" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Précédent
+                  </button>
+                  <button [disabled]="chargementEngagement || projetForm.get('exAntes')?.invalid || projetForm.get('exPosts')?.invalid"
+                          (click)="enregistrerIndicateurs()" type="button" class="btn btn-outline-primary">
+                    Continuer
+                    <i class="bi bi-arrow-right ms-2"></i>
+                  </button>
+                </div>
+
+              </ng-template>
+
+            </p-step-panel>
+
+
+
+            <p-step-panel [value]="5">
+              <ng-template #content let-activateCallback="activateCallback">
+                <div class="mb-3" >
+                  <div class="fw-bold h4 text-primary mb-0">Aspects financiers et opérationnels</div>
+                  <div class="fst-italic text-danger mt-0">Remplir les ressources budgétaires, le niveau de maturité et les bénéficiaires</div>
+                </div>
+
+                <div formGroupName="finances">
+
+                  <div class="form-floating mb-3">
+                    <input formControlName="envTotale" type="number" class="form-control" id="envTotalInput" placeholder="">
+                    <label for="envTotalInput">Enveloppe totale</label>
+                  </div>
+
+                  <div class="form-floating mb-3">
+                    <input formControlName="finePublic" type="number" class="form-control" id="financePublicInput" placeholder="">
+                    <label for="financePublicInput">Financement public</label>
+                  </div>
+
+                  <div class="form-floating mb-3">
+                    <input formControlName="fineHorsBudget" type="number" class="form-control" id="financeHorsBudgetInput" placeholder="">
+                    <label for="financeHorsBudgetInput">Financement hors-budget</label>
+                  </div>
+
+                  <div class="form-floating mb-3">
+                    <select formControlName="maturite" class="form-select" id="maturiteSelect" aria-label="Floating label select example">
+                      <option value="">Choisir</option>
+                      @for (m of maturites; track $index){
+                        <option [value]="m">{{m}}</option>
+                      }
+                    </select>
+                    <label for="maturiteSelect">Maturité du projet</label>
+                  </div>
+
+                  <div class="border rounded p-2">
+                    <div>Population cible</div>
+
+                    <div class="form-check form-switch mb-3">
+                      <input (change)="cibleTousChanged($event)" formControlName="cibleTous" class="form-check-input" type="checkbox" role="switch" id="switchCheckChecked">
+                      <label class="form-check-label" for="switchCheckChecked">Tous</label>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                      <input formControlName="cibleHorsDakar" class="form-check-input" type="checkbox" role="switch" id="switchCheckChecked">
+                      <label class="form-check-label" for="switchCheckChecked">Hors Dakar</label>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                      <input formControlName="cibleUrbains" class="form-check-input" type="checkbox" role="switch" id="switchCheckChecked">
+                      <label class="form-check-label" for="switchCheckChecked">Urbains</label>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                      <input formControlName="cibleRuraux" class="form-check-input" type="checkbox" role="switch" id="switchCheckChecked" >
+                      <label class="form-check-label" for="switchCheckChecked">Ruraux</label>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                      <input formControlName="cibleFaiblesRevenus" class="form-check-input" type="checkbox" role="switch" id="switchCheckChecked">
+                      <label class="form-check-label" for="switchCheckChecked">faibles revenus</label>
+                    </div>
+
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-3">
+                  <button (click)="previousStep()" type="button" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Précédent
+                  </button>
+                  <button [disabled]="chargementEngagement || projetForm.get('exAntes')?.invalid || projetForm.get('exPosts')?.invalid"
+                          (click)="enregistrerFinances()" type="button" class="btn btn-outline-primary">
+                    Continuer
+                    <i class="bi bi-arrow-right ms-2"></i>
+                  </button>
+                </div>
+              </ng-template>
+            </p-step-panel>
+
+            <p-step-panel [value]="6">
+              <ng-template #content let-activateCallback="activateCallback">
                 <div class="d-flex justify-content-between mt-3">
                   <button (click)="previousStep()" type="button" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-2"></i>
@@ -281,7 +446,6 @@
                   </button>
                 </div>
               </ng-template>
-
             </p-step-panel>
           </p-step-panels>
         </p-stepper>
