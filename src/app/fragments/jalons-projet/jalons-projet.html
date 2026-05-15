@@ -33,6 +33,7 @@
                 id="partenairesForm"
                 inputId="chips-combined"
                 [dropdown]="false"
+                [disabled]="saving"
                 formControlName="partenaires"
                 multiple fluid
                 [dataKey]="'id'"
@@ -53,38 +54,46 @@
           <tr>
             <td class="detailsLabel">Début prévu projet : </td>
             <td>
-              <p-datePicker appendTo="body" formControlName="debutPrevu" />
+              <p-datePicker [disabled]="saving" appendTo="body" formControlName="debutPrevu" />
             </td>
           </tr>
 
           <tr>
             <td class="detailsLabel">Début effectif du projet : </td>
             <td>
-              <p-datePicker appendTo="body" formControlName="debutEffectif" dateFormat="yy-mm-dd"  />
+              <p-datePicker [disabled]="saving" appendTo="body" formControlName="debutEffectif" dateFormat="yy-mm-dd"  />
             </td>
           </tr>
 
           <tr>
             <td class="detailsLabel">Fin prévue du projet : </td>
             <td>
-              <p-datePicker appendTo="body" formControlName="finPrevue" dateFormat="yy-mm-dd"/>
+              <p-datePicker [disabled]="saving" appendTo="body" formControlName="finPrevue" dateFormat="yy-mm-dd"/>
             </td>
           </tr>
 
           <tr>
             <td class="detailsLabel">Fin effective du projet : </td>
             <td>
-              <p-datePicker appendTo="body" formControlName="finEffective" dateFormat="yy-mm-dd"  />
+              <p-datePicker [disabled]="saving" appendTo="body" formControlName="finEffective" dateFormat="yy-mm-dd"  />
             </td>
           </tr>
           <tr>
             <td colspan="2" class="text-end">
               <span class="text-danger">{{msg}}</span>
               <button
+                [disabled]="saving"
                 (click)="saveJalonProjet()"
                 class="btn btn-outline-primary m-2">
                 Enregistrer et continuer
-                <i class="bi bi-arrow-right ms-2"></i>
+                @if (saving) {
+                  <div class="ms-2 spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                } @else {
+                  <i class="bi bi-arrow-right ms-2"></i>
+                }
+
               </button>
             </td>
           </tr>

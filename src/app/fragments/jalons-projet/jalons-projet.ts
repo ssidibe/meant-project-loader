@@ -31,6 +31,7 @@ export class JalonsProjet implements OnInit {
 
   filteredPartenaires: Structure[] = [];
   protected loading: boolean = false;
+  protected saving: boolean = false;
 
   partenairesDb: Structure[] = [];
   protected msg: string = '';
@@ -151,6 +152,7 @@ export class JalonsProjet implements OnInit {
       };
 
       console.log('envoie enregistrement  ', jalonDto);
+      this.saving = true;
       this.engagementService.saveJalonProjet(jalonDto).subscribe({
         error: (err) => {
           this.msg = `Erreur d'enregistrement code : ${err.status}, msg=${err.message} `;
@@ -159,7 +161,7 @@ export class JalonsProjet implements OnInit {
         complete: () => {
           //this.nextStep();
           console.log('enregistrement ok ', jalonDto);
-          this.etapeEmitter.emit(1)
+          gthis.etapeEmitter.emit(1)
         },
       });
     }
