@@ -161,7 +161,7 @@ export class JalonsProjet implements OnInit {
         complete: () => {
           //this.nextStep();
           console.log('enregistrement ok ', jalonDto);
-          gthis.etapeEmitter.emit(1)
+          this.etapeEmitter.emit(1)
         },
       });
     }
