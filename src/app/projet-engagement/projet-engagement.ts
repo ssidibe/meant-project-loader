@@ -1,18 +1,17 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ProjetDto, ProjetListView, TabCol } from '../ui.models';
 import { EngagementService } from '../services/engagement-service';
-import { DatePipe } from '@angular/common';
+import { DatePipe, JsonPipe } from '@angular/common';
 import { Table, TableModule } from 'primeng/table';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Skeleton } from 'primeng/skeleton';
 import { Button } from 'primeng/button';
-import { Tooltip } from 'primeng/tooltip';
 import { MultiSelect } from 'primeng/multiselect';
 
 @Component({
   selector: 'app-projet-engagement',
-  imports: [TableModule, FormsModule, DatePipe, Skeleton, Button, Tooltip, MultiSelect],
+  imports: [TableModule, FormsModule, Skeleton, MultiSelect, JsonPipe],
   templateUrl: './projet-engagement.html',
   styleUrl: './projet-engagement.scss',
 })
@@ -21,7 +20,7 @@ export class ProjetEngagement implements OnInit {
   first = 0;
   rows = 5;
   chargementList: boolean = false;
-  selectedProjet: ProjetDto|undefined;
+  selectedProjet: ProjetDto | undefined;
   colonnes: TabCol[] = [
     {
       entete: 'Axe',

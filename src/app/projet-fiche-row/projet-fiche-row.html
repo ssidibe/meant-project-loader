@@ -29,9 +29,12 @@
         <tr >
           <th id="nomOs" class="detailsLabel fw-normal">
             @if (projet.fichier.nomFicheProjet.toLowerCase().endsWith('.pdf')){
-              <a target="_blank" href="http://127.0.0.1:8080/engagements/projets/fiches/{{projet.fichier?.id}}">
-                <img src="/images/PDF_file_icon.svg" alt="PDF"  height="40" width="30" >
+              <a target="_blank" href="{{getProjetFicheFile()}}">
+                @if (projet.fichier.nomFicheProjet.toLowerCase().endsWith('.pdf')) {
+                  <img src="/images/PDF_file_icon.svg" alt="PDF"  height="40" width="30" >
+                }
               </a>
+
             }
           </th>
           <td>
@@ -46,7 +49,7 @@
       <div class="card">
         <p-fileupload
           [customUpload]="true"
-          [multiple]="false" accept=".pdf,.doc,.docx,application/pdf" maxFileSize="10000000"
+          [multiple]="false" accept=".pdf,application/pdf" maxFileSize="10000000"
           (onSelect)="onSelectedFile($event)">
           <ng-template #header let-files let-chooseCallback="chooseCallback" let-clearCallback="clearCallback" let-uploadCallback="uploadCallback">
             <table style="width: 100%">

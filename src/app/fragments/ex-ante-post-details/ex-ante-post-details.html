@@ -1,0 +1,20 @@
+<div>
+  @if (exAnteVal){
+    <span>ex ante {{getValue(exAnteVal)}}</span>
+  } @else {
+    <span class="text-danger">ex ante non renseigné</span>
+  }
+  @if(exAnteComm){
+    <span class="msgEx"> ({{exAnteComm}})</span>
+  }
+</div>
+<div>
+  @if (exPostVal){
+    <span>ex post {{getValue(exPostVal)}}</span>
+  } @else {
+    <span class="text-danger">ex post non renseigné</span>
+  }
+  @if(exPostComm){
+    <span class="msgEx"> ({{exPostComm}})</span>
+  }
+</div>

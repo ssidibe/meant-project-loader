@@ -16,6 +16,7 @@ import { EngagementService } from '../services/engagement-service';
 import { Badge } from 'primeng/badge';
 import { DatePipe, JsonPipe, NgOptimizedImage } from '@angular/common';
 import { HttpEventType } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-projet-fiche-row',
@@ -43,6 +44,8 @@ export class ProjetFicheRow {
   ficheProjet?: File;
 
   progression: number = 0;
+
+  ficheFileUrlBase = `${environment.API.BASE_URL}/${environment.API.SERVICES.ENGAGEMENTS}/projets/fiches`;
 
   @Output() selectionChange = new EventEmitter<any>(); // ou un type spécifique
 
@@ -76,9 +79,9 @@ export class ProjetFicheRow {
     return (bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i];
   }
 
-  protected uploadFile(clearCallback:Function) {
+  protected uploadFile(clearCallback: Function) {
     console.log('upload url', this.projet?.id);
-    this.setProgressBar(0)
+    this.setProgressBar(0);
     if (this.projet && this.ficheProjet) {
       this.engagementService.uploadFicheProjet(this.projet.id, this.ficheProjet).subscribe({
         next: (event) => {
@@ -108,12 +111,19 @@ export class ProjetFicheRow {
   }
 
   private setProgressBar(progress: number) {
-    if (progress>0){
+    if (progress > 0) {
       this.progression = progress - 1;
-    }else{
+    } else {
       this.progression = 0;
     }
     console.log(`Upload progress: ${this.progression}%`);
     this.cdr.detectChanges();
+  }
+
+  protected getProjetFicheFile() {
+    if(this.projet && this.projet.fichier) {
+      return `${this.ficheFileUrlBase}/${this.projet.fichier.id}`;
+    }
+    return "-1";
   }
 }

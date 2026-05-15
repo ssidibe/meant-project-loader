@@ -1,0 +1,32 @@
+@if (projet){
+  <form [formGroup]="projetForm">
+    @for (epForm of engPopuList.controls; let epI=$index; track epI){
+      @if (epForm.get('selected')?.value){
+        <i class="bi bi-check"></i>&nbsp;<span>{{epForm.get('nom')?.value}}</span>
+        <div class="ps-4">
+          @for (dpForm of getDomains(epI).controls; let dpIndex= $index; track dpIndex){
+            @if (dpForm.get('selected')?.value) {
+              <i class="bi bi-check"></i>&nbsp;<span>{{dpForm.get('nom')?.value}}</span>
+              @for (focusForm of getFocusArray(epI,dpIndex).controls; let focIdx=$index; track $index) {
+                @if (focusForm.get('selected')?.value){
+                  <div class="ps-4">
+                    <i class="bi bi-check"></i>&nbsp;<span>{{focusForm.get('nom')?.value}} : {{focusForm.get('selected')?.value}}</span>
+                    <div class="ps-4">
+                      @for (indicForm of getIndicArray(epI,dpIndex, focIdx).controls; track $index) {
+                        <i class="bi bi-check"></i>&nbsp;<span class="fw-bold">{{indicForm.get('nom')?.value}}</span>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+            }
+          }
+        </div>
+      }
+
+    }
+  </form>
+} @else {
+
+}
+

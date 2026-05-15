@@ -15,9 +15,9 @@ import { ProjetsFiche } from './projets-fiche/projets-fiche';
 import { UsersList } from './users/users-list/users-list';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'projets', pathMatch: 'full' },
+  { path: '', redirectTo: 'feuille-de-route', pathMatch: 'full' },
   { path: 'feuille-de-route', component: ProjetEngagement },
-  { path: 'users', component: UsersList},
+  { path: 'users', component: UsersList },
   { path: 'feuille-de-route/:id', component: ProjetEngagementDetails },
   { path: 'projets/:numero/edit', component: ProjetsEdit },
   { path: 'projets/list', component: ProjetsList },

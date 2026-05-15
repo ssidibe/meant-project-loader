@@ -34,6 +34,7 @@ function isIgnoredUrl(url: string): boolean {
   return (
     url.includes('/auth/login') ||
     url.includes('/auth/refresh') ||
+    url.includes('/auth/logout') ||
     url.includes('/assets') ||
     url.includes(LOGIN_URL)
   );
@@ -60,7 +61,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next): Observable<HttpEv
       return handle401(authReq, next, httpBackend);
     }),
   );
-};;
+};
 
 
 /**

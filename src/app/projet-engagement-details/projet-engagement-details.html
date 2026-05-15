@@ -1,4 +1,3 @@
-
 <div class="bg-white p-4 rounded-4">
   @if (engagementProjet){
     <div class="h4 text-center">
@@ -6,9 +5,9 @@
     </div>
     <div class="border rounded-3 p-3 flex justify-center">
       <form [formGroup]="projetForm">
-        <p-stepper
-          [value]="etape"
-          [linear]="true"
+        <p-stepper (valueChange)="onStepChange($event)"
+          [(value)]="etape"
+          [linear]="false"
           class="basis-[50rem]">
           <p-step-list>
             <p-step [value]="1">Jalons Projet</p-step>
@@ -21,91 +20,11 @@
           <p-step-panels>
             <p-step-panel [value]="1">
               <ng-template #content let-activateCallback="activateCallback">
-
-                <div class=" p-2">
-                  <table class="formTable">
-                    <tr>
-                      <th id="structure" class="detailsLabel">Structure : </th>
-                      <td>{{ engagementProjet.porteur }}</td>
-                    </tr>
-                    <tr>
-                      <td class="detailsLabel">Programme : </td>
-                      <td>{{ engagementProjet.programme }}</td>
-                    </tr>
-                    <tr>
-                      <td class="detailsLabel">Objectif stratégique : </td>
-                      <td>{{ engagementProjet.os }}</td>
-                    </tr>
-
-                    <tr>
-                      <td class="detailsLabel">Axe : </td>
-                      <td>{{ engagementProjet.axe }}</td>
-                    </tr>
-
-                    <tr>
-                      <td class="detailsLabel">Partenaires : </td>
-                      <td>
-                        <p-autoComplete
-                          id="partenairesForm"
-                          inputId="chips-combined"
-                          [dropdown]="false"
-                          formControlName="partenaires"
-                          multiple fluid
-                          [dataKey]="'id'"
-                          [optionLabel]="getPartenaireLabel"
-                          [optionValue]="getPartenaireValue"
-                          [suggestions]="filteredPartenaires"
-                          (completeMethod)="searchPartenaire($event)"
-                          [addOnBlur]="true"
-                          [addOnTab]="true" ></p-autoComplete>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td class="detailsLabel">Résultats attendus : </td>
-                      <td>{{ engagementProjet.axe }}</td>
-                    </tr>
-
-                    <tr>
-                      <td class="detailsLabel">Début prévu projet : </td>
-                      <td>
-                        <p-datePicker formControlName="debutPrevu" dateFormat="yy-mm-dd"  />
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td class="detailsLabel">Début effectif du projet : </td>
-                      <td>
-                        <p-datePicker formControlName="debutEffectif" dateFormat="yy-mm-dd"  />
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td class="detailsLabel">Fin prévue du projet : </td>
-                      <td>
-                        <p-datePicker formControlName="finPrevue" dateFormat="yy-mm-dd"  />
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td class="detailsLabel">Fin effective du projet : </td>
-                      <td>
-                        <p-datePicker formControlName="finEffective" dateFormat="yy-mm-dd"  />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colspan="2" class="text-end">
-                        <span class="text-danger">{{msg}}</span>
-                        <button
-                          (click)="saveProjet()"
-                          class="btn btn-outline-primary m-2">
-                          Enregistrer et continuer
-                          <i class="bi bi-arrow-right ms-2"></i>
-                        </button>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
+                @if(etape==1){
+                  <app-jalons-projet
+                    (etapeEmitter)="suivant(1)"
+                    [projetId]="engagementProjet.projetId"></app-jalons-projet>
+                }
               </ng-template>
             </p-step-panel>
             <p-step-panel [value]="2">
@@ -137,11 +56,11 @@
                           {{activite.nom}}
                         </td>
                         <td>
-                          {{activite.porteur.nom}}
+                          {{activite.porteur}}
                         </td>
                         <td class="p-0">
                           @for (p of activite.partenaires; track p; let iP = $index, isFirst = $first) {
-                            <div [class.border-top]="!isFirst">{{p.nom}}</div>
+                            <div [class.border-top]="!isFirst">{{p}}</div>
                           }
                         </td>
                         <td>
@@ -190,6 +109,7 @@
                     <div class="h3 mt-3 border-bottom border-primary ">Ex-Ante (prévisions)</div>
 
                     <table class="mt-4 mb-5">
+
                       @for (exForm of exAntes.controls; let i = $index; track i) {
                         <tr [formGroupName]="i">
                           <th class="detailsLabel">Trimestres {{i+1}} :</th>
@@ -203,8 +123,13 @@
                           </td>
                           <td>
                             <p-floatlabel class="ms-4"  variant="on" >
-                              <input style="min-width: 300px" pInputText id="comm_ant_{{i}}" fluid autocomplete="off" />
-                              <label for="comm_ant_{{i}}">Commentaires</label>
+                              <input
+                                id="comment_ant_{{i}}"
+                                formControlName="commentaire"
+                                style="min-width: 300px"
+                                pInputText
+                                fluid autocomplete="off" />
+                              <label for="comment_ant_{{i}}">Commentaires</label>
                             </p-floatlabel>
                           </td>
                         </tr>
@@ -219,17 +144,22 @@
                         <tr [formGroupName]="i">
                           <th class="detailsLabel pt-2">Trimestres {{i+1}} :</th>
                           <td class="pt-2">
-                            <input formControlName="taux"
-                                   [invalid]="exForm.touched && exForm.get('taux')?.invalid"
-                                   pInputText
-                                   pInputMask="9?99"
-                                   style="width: 86px; text-align: right"
-                                   placeholder="0 à 100"/> %
+                            <input
+                              formControlName="taux"
+                              [invalid]="exForm.touched && exForm.get('taux')?.invalid"
+                              pInputText
+                              pInputMask="9?99"
+                              style="width: 86px; text-align: right"
+                              placeholder="0 à 100"/> %
                           </td>
                           <td>
                             <p-floatlabel class="ms-4"  variant="on" >
-                              <input style="min-width: 300px" pInputText id="comm_post_{{i}}" fluid autocomplete="off" />
-                              <label for="comm_post_{{i}}">Commentaires</label>
+                              <input
+                                id="comment_post_{{i}}"
+                                formControlName="commentaire"
+                                style="min-width: 300px"
+                                pInputText fluid autocomplete="off"/>
+                              <label for="comment_post_{{i}}">Commentaires</label>
                             </p-floatlabel>
                           </td>
                         </tr>
@@ -434,6 +364,226 @@
 
             <p-step-panel [value]="6">
               <ng-template #content let-activateCallback="activateCallback">
+
+                <div class="mb-3" >
+                  <div class="sousTitreRecapProjet mb-0">Recapitulation du projet</div>
+                </div>
+
+                <div>
+                  <table class="recap">
+                    <tr>
+                      <th class="detailsLabel">Nom projet :</th>
+                      <td class="detailsValue">{{engagementProjet.nom}}</td>
+                    </tr>
+                    <tr>
+                      <th class="detailsLabel">Axe {{engagementProjet.axeNum}} : </th>
+                      <td class="detailsValue">{{engagementProjet.axeName}}</td>
+                    </tr>
+                    <tr>
+                      <th class="detailsLabel">OS {{engagementProjet.axeNum}}.{{engagementProjet.osNum}} : </th>
+                      <td class="detailsValue">{{engagementProjet.osName}}</td>
+                    </tr>
+                    <tr>
+                      <th class="detailsLabel">Programme : </th>
+                      <td class="detailsValue">{{engagementProjet.programme}}</td>
+                    </tr>
+                    <tr>
+                      <th class="detailsLabel">Porteur : </th>
+                      <td class="detailsValue">{{engagementProjet.porteur}}</td>
+                    </tr>
+                    <tr>
+                      <th class="detailsLabel">Partenaires : </th>
+                      <td class="detailsValue">
+                        @for (p of engagementProjet.partenaires; track $index){
+                          @if (p.code==p.nom) {
+                            <div>{{p.code}}</div>
+                          } @else {
+                            <div>
+                              {{p.nom}}
+                              @if (p.code) {
+                                ({{p.code}})
+                              }
+                            </div>
+                          }
+
+                        }
+
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td class="sousTitreRecapProjet" colspan="2">Jalons du projet</td>
+                    </tr>
+                    <tr>
+                      <td class="detailsLabel">Date de début prévue : </td>
+                      <td class="detailsValue">{{engagementProjet.debutPrevu}}</td>
+                    </tr>
+
+                    <tr>
+                      <td class="detailsLabel">Date de début effective : </td>
+                      <td class="detailsValue">{{engagementProjet.debutEffectif}}</td>
+                    </tr>
+
+                    <tr>
+                      <td class="detailsLabel">Date de fin prévue : </td>
+                      <td class="detailsValue">{{engagementProjet.finPrevue}}</td>
+                    </tr>
+
+                    <tr>
+                      <td class="detailsLabel">Date de fin effective : </td>
+                      <td class="detailsValue">{{engagementProjet.finEffective}}</td>
+                    </tr>
+                    <tr>
+                      <td class="sousTitreRecapProjet" colspan="2" >
+                        Jalon des activités
+                      </td>
+                    </tr>
+
+                        @if (engagementProjet.actions.length==0){
+                          <tr>
+                            <td class="text-danger fw-bold" colspan="2">Aucune activité n’a été saisie pour ce projet.</td>
+                          </tr>
+                        } @else {
+                          @for (action of engagementProjet.actions; track $index){
+                            <tr>
+                              <td colspan="2" class="bg-light ps-2 h5 fw-bold">{{action.nom}}</td>
+                            </tr>
+                            <tr>
+                              <td class="detailsLabel">Date début prévue :</td>
+                              <td class="detailsValue">{{action.debutPrevu}}</td>
+                            </tr>
+                            <tr>
+                              <td class="detailsLabel">Date début effective :</td>
+                              <td class="detailsValue"> {{action.debutEffectif}} </td>
+                            </tr>
+                            <tr>
+                              <td class="detailsLabel">Date fin prévue :</td>
+                              <td class="detailsValue"> {{action.debutPrevu}} </td>
+                            </tr>
+                            <tr>
+                              <td class="detailsLabel">Date fin effective :</td>
+                              <td class="detailsValue"> {{action.debutEffectif}} </td>
+                            </tr>
+                            <tr>
+                              <td class="detailsLabel">Porteur :</td>
+                              <td class="detailsValue"> {{action.porteur}} </td>
+                            </tr>
+                            <tr>
+                              <td class="detailsLabel">Partenaires : </td>
+                              <td>
+                                @if (action.partenaires.length==0){
+                                  <span class="text-danger">Les partenaires du projet n’ont pas été indiqués</span>
+                                } @else {
+                                  @for (p of action.partenaires; track $index){
+                                    <div>{{p}}</div>
+                                  }
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="detailsLabel">Résultats attendus :</td>
+                              <td>
+                                @if(action.resultatsAttendus.length == 0){
+                                  <span class="text-danger mx-2">Les résultats attendus du projet n’ont pas été indiqués</span>
+                                }@else{
+                                  @for (r of action.resultatsAttendus; track $index){
+                                    <div >{{r}}</div>
+                                  }
+                                }
+                              </td>
+                            </tr>
+                          }
+                        }
+                    <tr>
+                      <td class="sousTitreRecapProjet" colspan="2">Etat d'avancement</td>
+                    </tr>
+                    @if (listExAntePost.length==0){
+                      <tr>
+                        <td class="text-danger fw-bold" colspan="2">Pas d'avancement saisie</td>
+                      </tr>
+                    } @else {
+                      @for (exAP of listExAntePost; track $index){
+                        <tr>
+                          <td colspan="2" class="bg-light ps-2 h5 fw-bold">{{exAP.annee}}</td>
+                        </tr>
+                        <tr>
+                          <td class="detailsLabel">Trimestre 1 :</td>
+                          <td class="detailsValue">
+                            <app-ex-ante-post-details [exAnteComm]="exAP.t1AnteComm" [exAnteVal]="exAP.t1Ante"
+                              [exPostComm]="exAP.t1PostComm" [exPostVal]="exAP.t1Post"></app-ex-ante-post-details>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td class="detailsLabel">Trimestre 2 :</td>
+                          <td class="detailsValue">
+                            <app-ex-ante-post-details [exAnteComm]="exAP.t2AnteComm" [exAnteVal]="exAP.t2Ante"
+                                                      [exPostComm]="exAP.t2PostComm" [exPostVal]="exAP.t2Post"></app-ex-ante-post-details>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td class="detailsLabel">Trimestre 3 :</td>
+                          <td class="detailsValue">
+                            <app-ex-ante-post-details [exAnteComm]="exAP.t3AnteComm" [exAnteVal]="exAP.t3Ante"
+                                                      [exPostComm]="exAP.t3PostComm" [exPostVal]="exAP.t3Post"></app-ex-ante-post-details>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td class="detailsLabel">Trimestre 4 :</td>
+                          <td class="detailsValue">
+                            <app-ex-ante-post-details [exAnteComm]="exAP.t4AnteComm" [exAnteVal]="exAP.t4Ante"
+                                                      [exPostComm]="exAP.t4PostComm" [exPostVal]="exAP.t4Post"></app-ex-ante-post-details>
+                          </td>
+                        </tr>
+                      }
+                    }
+                    <tr>
+                      <td class="sousTitreRecapProjet" colspan="2">Indicateur de pilotage</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">
+                        <app-recap-indic-pilote
+                          [projetId]="engagementProjet.projetId"
+                        >
+
+                        </app-recap-indic-pilote>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="sousTitreRecapProjet" colspan="2">Financements</td>
+                    </tr>
+                    <tr>
+                      <td class="detailsLabel">Enveloppe Totale :</td>
+                      <td class="detailsValue">{{engagementProjet.enveloppe|xofFormat}}</td>
+                    </tr>
+                    <tr>
+                      <td class="detailsLabel">Financement public :</td>
+                      <td class="detailsValue">{{engagementProjet.financementPublic|xofFormat}}</td>
+                    </tr>
+                    <tr>
+                      <td class="detailsLabel">Financement hors-budget :</td>
+                      <td class="detailsValue">{{engagementProjet.financementHorsBudget|xofFormat}}</td>
+                    </tr>
+                    <tr>
+                      <td class="detailsLabel">Maturité du projet :</td>
+                      <td class="detailsValue">{{engagementProjet.maturite}}</td>
+                    </tr>
+                    <tr>
+                      <td class="detailsLabel">Populations cibles :</td>
+                      @if (engagementProjet.cibles && engagementProjet.cibles.length>0){
+                        @for (cible of engagementProjet.cibles; track $index; let first=$first; let last=$last){
+                          <div [class.border-bottom]="!last">{{cible}}</div>
+                        }
+                      } @else {
+                        <td class="detailsValue text-danger fw-bold">Aucune population cible n’a été sélectionnée</td>
+                      }
+                    </tr>
+                  </table>
+                </div>
+
+
                 <div class="d-flex justify-content-between mt-3">
                   <button (click)="previousStep()" type="button" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-2"></i>
@@ -485,12 +635,13 @@
           <p-autoComplete
             id="porteurActiviteForm"
             inputId="chips-combined"
+            appendTo="body"
             [dropdown]="false"
             formControlName="porteur"
             [dataKey]="'id'"
             [fluid]="true"
-            [optionLabel]="getPartenaireLabel"
-            [optionValue]="getPartenaireValue"
+            [optionLabel]="utilService.getPartenaireLabel"
+            [optionValue]="utilService.getPartenaireValue"
             [suggestions]="filteredPartenaires"
             (completeMethod)="searchPartenaire($event)"
             [addOnBlur]="true"
@@ -507,12 +658,13 @@
           <p-autoComplete
             id="partenairesActiviteForm"
             inputId="chips-combined"
+            appendTo="body"
             [dropdown]="false"
             formControlName="partenaires"
             [dataKey]="'id'"
             [fluid]="true"
-            [optionLabel]="getPartenaireLabel"
-            [optionValue]="getPartenaireValue"
+            [optionLabel]="utilService.getPartenaireLabel"
+            [optionValue]="utilService.getPartenaireValue"
             [suggestions]="filteredPartenaires"
             (completeMethod)="searchPartenaire($event)"
             [addOnBlur]="true"
@@ -528,6 +680,7 @@
           <p-autoComplete
             id="resultatsAttendusForm"
             inputId="chips-combined"
+            appendTo="body"
             formControlName="resultatsAttendus"
             multiple fluid [typeahead]="false"
             [addOnBlur]="true"
@@ -540,6 +693,7 @@
       <div class="col-6">
         <p-floatlabel variant="on" class="my-2">
           <p-datePicker
+            appendTo="body"
             formControlName="debutPrevu"
             inputId="debutPrevu"
             showIcon iconDisplay="input" dateFormat="yy-mm-dd" />
@@ -550,6 +704,7 @@
       <div class="col-6">
         <p-floatlabel variant="on" class="my-2">
           <p-datePicker
+            appendTo="body"
             formControlName="debutEffectif"
             inputId="debutEffectif" showIcon iconDisplay="input" dateFormat="yy-mm-dd" />
           <label for="debutEffectif">Début réel de l’activité</label>
@@ -558,6 +713,7 @@
       <div class="col-6">
         <p-floatlabel variant="on" class="my-2">
           <p-datePicker
+            appendTo="body"
             formControlName="finPrevue"
             inputId="finPrevue" showIcon iconDisplay="input" dateFormat="yy-mm-dd" />
           <label for="finPrevue">Fin prévue de l'activité</label>
@@ -567,6 +723,7 @@
       <div class="col-6">
         <p-floatlabel variant="on" class="my-2">
           <p-datePicker
+            appendTo="body"
             formControlName="finEffective"
             inputId="finEffective" showIcon iconDisplay="input" dateFormat="yy-mm-dd" />
           <label for="finEffective">Fin réelle de l’activité</label>

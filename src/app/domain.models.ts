@@ -7,7 +7,7 @@ export interface User {
   email: string;
   telephone?: string;
   roles: string[];
-  structures: string[];
+  structure: string;
 }
 
 export interface ProjetDto {
@@ -51,7 +51,7 @@ export interface EngagementProjetDto {
   projetNumero: number;
   nom: string;
   porteur?: string;
-  partenaires: string[];
+  partenaires: Structure[];
   resultatsAttendus: string[];
   indicateurs: string[];
   debutPrevu?: string;
@@ -65,9 +65,11 @@ export interface EngagementProjetDto {
   maturite?: string;
   cibles?: string[];
   actions: Action[];
-  axe?: string;
-  os?: string;
-  programme?: string;
+  axeNum?:number;
+  axeName?: string;
+  osNum?: number;
+  osName?: string;
+  programme: string;
 
   porteurId?: number;
   porteur2Id?: number;
@@ -84,4 +86,18 @@ export interface Structure{
 export interface Indicateur{
   id: number;
   nom: string;
+}
+
+export interface UserDto {
+  id: number;
+  email: string;
+  enabled:boolean;
+  verified:boolean;
+  titre: string;
+  prenom: string;
+  nom: string;
+  telephone?: string;
+  structure: string;
+  roles: string[];
+  createurId?:number;
 }

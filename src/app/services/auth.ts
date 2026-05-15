@@ -1,27 +1,26 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { User } from '../domain.models';
+import { environment } from '../../environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Auth {
-  private STORAGE_AUTH_USER: string = 'auth_user';
+  authBaseUrl = `${environment.API.BASE_URL}/${environment.API.SERVICES.AUTH}`;
 
-  logout():Observable<void> {
-    localStorage.removeItem(this.STORAGE_AUTH_USER);
-    return EMPTY;
+  constructor(private readonly http: HttpClient) {}
+
+  getUser(): Observable<User> {
+    const url = `${this.authBaseUrl}/me`;
+    console.log('url', url);
+    return this.http.get<User>(url);
   }
 
-  getAuthenticatedUser(): User | null {
-    const user= localStorage.getItem(this.STORAGE_AUTH_USER);
-    if (user) {
-      return JSON.parse(user);
-    }
-    return null;
-  }
-
-  isLoggedIn(): boolean {
-    return this.getAuthenticatedUser()==null;
+  logout(): Observable<void> {
+    const url = `${this.authBaseUrl}/deconnexion`;
+    console.log('url logout', url);
+    return this.http.get<void>(url);
   }
 }

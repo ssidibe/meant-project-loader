@@ -65,3 +65,34 @@ main {
   @extend .border-5;
   @extend .border-dark;
 }
+
+.sousTitreRecapProjet{
+  @extend .fw-bold;
+  @extend .h4;
+  @extend .text-primary;
+  @extend .pt-3;
+}
+
+.recap{
+  width: 100%;
+  tr{
+    @extend .border-top;
+    td{
+      @extend .py-2;
+    }
+  }
+  tr:last-child {
+    @extend .border-bottom;
+  }
+}
+
+.formTable{
+  tr{
+    td{
+      @extend .py-1;
+    }
+
+  }
+  width: 100%;
+}
+

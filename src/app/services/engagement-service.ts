@@ -4,12 +4,17 @@ import { HttpClient, HttpEvent, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   ActiviteDto,
-  AvancementProjetDto, Cible,
+  AvancementProjetAnnuelDto,
+  AvancementProjetDto,
+  Cible,
   DomainePrioDto,
   EngagePopuDto,
   FicheProjetDto,
-  FocusDto, IndicateurDto, ProjetFinanceDto,
-  ProjetListView
+  FocusDto,
+  IndicateurDto,
+  JalonProjetDto,
+  ProjetFinanceDto,
+  ProjetListView,
 } from '../ui.models';
 import { EngagementProjetDto, Structure } from '../domain.models';
 
@@ -41,10 +46,10 @@ export class EngagementService {
     return this.httpClient.get<AvancementProjetDto[]>(url);
   }
 
-  saveEngagementProjetDto(engagement: EngagementProjetDto): Observable<EngagementProjetDto> {
-    const url = `${this.projetBaseUrl}/${engagement.projetId}`;
+  saveJalonProjet(engagement: JalonProjetDto): Observable<void> {
+    const url = `${this.projetBaseUrl}/${engagement.projetId}/jalon`;
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.httpClient.put<EngagementProjetDto>(url, engagement, { headers: headers });
+    return this.httpClient.put<void>(url, engagement, { headers: headers });
   }
 
   createActivite(activite: ActiviteDto): Observable<EngagementProjetDto> {
@@ -108,11 +113,15 @@ export class EngagementService {
     return this.httpClient.get<IndicateurDto[]>(url);
   }
 
-
-  saveFinances(finances: ProjetFinanceDto):Observable<void> {
+  saveFinances(finances: ProjetFinanceDto): Observable<void> {
     const url = `${this.projetBaseUrl}/${finances.projetId}/finances`;
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     console.log('enregistrement finance', finances);
     return this.httpClient.put<void>(url, finances, { headers: headers });
+  }
+
+  loadRecap(projetId: number): Observable<AvancementProjetAnnuelDto[]> {
+    const url = `${this.projetBaseUrl}/${projetId}/avancements-annuels`;
+    return this.httpClient.get<AvancementProjetAnnuelDto[]>(url);
   }
 }

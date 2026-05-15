@@ -12,10 +12,12 @@ import { AutoComplete } from 'primeng/autocomplete';
 import {
   ActiviteDto,
   AvancementProjetAnnuel,
+  AvancementProjetAnnuelDto,
   AvancementProjetDto,
   DomainePrioDto,
   EngagePopuDto,
-  FocusDto, ProjetFinanceDto,
+  FocusDto,
+  ProjetFinanceDto,
 } from '../ui.models';
 import { Step, StepList, StepPanel, StepPanels, Stepper } from 'primeng/stepper';
 import { InputText } from 'primeng/inputtext';
@@ -23,6 +25,12 @@ import { Select } from 'primeng/select';
 import { InputMaskDirective } from 'primeng/inputmask';
 import { ProjetService } from '../services/projet-service';
 import { expand } from 'rxjs';
+import { CurrencyPipe, JsonPipe } from '@angular/common';
+import { ExAntePostDetails } from '../fragments/ex-ante-post-details/ex-ante-post-details';
+import { RecapIndicPilote } from '../fragments/recap-indic-pilote/recap-indic-pilote';
+import { XofFormatPipe } from '../xof-format-pipe';
+import { UtilService } from '../services/util-service';
+import { JalonsProjet } from '../fragments/jalons-projet/jalons-projet';
 
 
 @Component({
@@ -44,12 +52,19 @@ import { expand } from 'rxjs';
     InputText,
     Select,
     InputMaskDirective,
+    JsonPipe,
+    ExAntePostDetails,
+    RecapIndicPilote,
+    CurrencyPipe,
+    XofFormatPipe,
+    JalonsProjet,
   ],
   templateUrl: './projet-engagement-details.html',
   styleUrl: './projet-engagement-details.scss',
 })
 export class ProjetEngagementDetails implements OnInit {
-  etape: number = 6;
+  etape: number = 1;
+  exTypes = ['EX_ANTE', 'EX_POST'];
   maturites = ['Idée / intention', 'Études / préparation', 'Lancement', 'Avancé', 'Opérationnel'];
   annees: number[] = [2024, 2025, 2026, 2027, 2028, 2029, 2031, 2032, 2033, 2034, 2035];
   trimestreMonth = [2, 5, 8, 11];
@@ -58,6 +73,9 @@ export class ProjetEngagementDetails implements OnInit {
   avancementProjetAnnuel?: AvancementProjetAnnuel;
   indicateursSource: Indicateur[] | undefined;
   chargementIndicateurs: boolean = false;
+  chargementListExAntePost: boolean = false;
+  chargementListExAntePostError: string = '';
+  listExAntePost: AvancementProjetAnnuelDto[] = [];
 
   projetId: number | null = null;
   engagementProjet?: EngagementProjetDto;
@@ -100,6 +118,11 @@ export class ProjetEngagementDetails implements OnInit {
     debutPrevu: new FormControl('', [Validators.required]),
     finPrevue: new FormControl(new Date(), [Validators.required]),
     activites: new FormArray([]),
+    axeNum: new FormControl('', [Validators.required]),
+    axeName: new FormControl('', [Validators.required]),
+    osNum: new FormControl('', [Validators.required]),
+    osName: new FormControl('', [Validators.required]),
+    programme: new FormControl('', [Validators.required]),
     finances: new FormGroup({
       envTotale: new FormControl<number>(0),
       finePublic: new FormControl<number>(0),
@@ -120,7 +143,7 @@ export class ProjetEngagementDetails implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly engagementService: EngagementService,
-    private readonly projetService: ProjetService,
+    protected readonly utilService: UtilService,
     private readonly cdr: ChangeDetectorRef,
   ) {}
 
@@ -172,8 +195,8 @@ export class ProjetEngagementDetails implements OnInit {
     this.engagementService.getEngagementTauxProjetId(projetId, year).subscribe({
       next: (data) => {
         console.log('data', data);
-        const exTypes = ['EX_ANTE', 'EX_POST'];
-        exTypes.forEach((exType) => {
+
+        this.exTypes.forEach((exType) => {
           this.trimestreMonth.forEach((mois) => {
             const avancementProjet = data.find(
               (a) => new Date(a.datation).getMonth() === mois && a.tauxType === exType,
@@ -192,6 +215,7 @@ export class ProjetEngagementDetails implements OnInit {
                 Validators.min(0),
                 Validators.max(100),
               ]),
+              commentaire: new FormControl(avancementProjet.commentaire),
             });
             if (avancementProjet.tauxType === 'EX_ANTE') {
               console.log('ex-ante');
@@ -231,7 +255,13 @@ export class ProjetEngagementDetails implements OnInit {
         id: new FormControl(this.engagementProjet.projetId, [Validators.required]),
         numero: new FormControl(this.engagementProjet.projetNumero, [Validators.required]),
         nom: new FormControl(this.engagementProjet.nom, [Validators.required]),
-        partenaires: new FormControl<string[]>(
+        axeNum: new FormControl(this.engagementProjet.axeNum, [Validators.required]),
+        axeName: new FormControl(this.engagementProjet.axeName, [Validators.required]),
+        osNum: new FormControl(this.engagementProjet.osNum, [Validators.required]),
+        osName: new FormControl(this.engagementProjet.osName, [Validators.required]),
+        programme: new FormControl(this.engagementProjet.programme, [Validators.required]),
+
+        partenaires: new FormControl<Structure[]>(
           this.engagementProjet.partenaires,
           Validators.required,
         ),
@@ -244,6 +274,7 @@ export class ProjetEngagementDetails implements OnInit {
         debutPrevu: new FormControl(this.engagementProjet.debutPrevu, [Validators.required]),
         finPrevue: new FormControl(this.engagementProjet.finPrevue, [Validators.required]),
         activites: new FormArray([]),
+
         finances: new FormGroup({
           envTotale: new FormControl(this.engagementProjet.enveloppe),
           finePublic: new FormControl(this.engagementProjet.financementPublic),
@@ -259,30 +290,14 @@ export class ProjetEngagementDetails implements OnInit {
           cibleHorsDakar: new FormControl<boolean>(
             !!this.engagementProjet.cibles?.includes('Hors Dakar'),
           ),
-          cibleTous: new FormControl<boolean>(
-            !!this.engagementProjet.cibles?.includes('Tous')
-          ),
+          cibleTous: new FormControl<boolean>(!!this.engagementProjet.cibles?.includes('Tous')),
         }),
         engagementsPopu: new FormArray([]),
         annee: new FormControl(new Date().getFullYear(), [Validators.required]),
         exAntes: new FormArray([]),
         exPosts: new FormArray([]),
       });
-      /*this.projetService.getAllIndicateurs().subscribe({
-        next: (results) => {
-          console.log('indicateurs results', results);
-          results.forEach((indicateur) => {
-            this.addIndicateur(indicateur);
-          });
-        },
-        error: (error) => {
-          console.error('error getAllIndicateurs', error);
-          this.cdr.detectChanges();
-        },
-        complete: () => {
-          this.cdr.detectChanges();
-        },
-      });*/
+
       this.loadEngagements();
       this.engagementProjet.actions.forEach((action) => {
         this.addActivite(action);
@@ -317,39 +332,6 @@ export class ProjetEngagementDetails implements OnInit {
     }
 
     this.cdr.detectChanges();
-  }
-
-  protected saveProjet() {
-    this.msg = '';
-    const engagement: EngagementProjetDto = {
-      projetId: this.projetForm.controls['id'].value,
-      projetNumero: this.projetForm.controls['numero'].value,
-      nom: this.projetForm.controls['nom'].value,
-      partenaires: [...this.projetForm.controls['partenaires'].value],
-      indicateurs: [...this.getSelectedIndicateurs()],
-      resultatsAttendus: this.projetForm.controls['resultatsAttendus'].value,
-      debutPrevu: this.projetForm.controls['debutPrevu'].value,
-      debutEffectif: this.projetForm.controls['debutEffectif'].value,
-      finPrevue: this.projetForm.controls['finPrevue'].value,
-      finEffective: this.projetForm.controls['finEffective'].value,
-      actions: [],
-    };
-
-    console.log('envoie enregistrement  ', engagement);
-    this.engagementService.saveEngagementProjetDto(engagement).subscribe({
-      next: (data) => {
-        console.log('enregistrement ok données recu ', data);
-        this.engagementProjet = data;
-      },
-      error: (err) => {
-        this.msg = `Erreur d'enregistrement code : ${err.status}, msg=${err.message} `;
-        this.cdr.detectChanges();
-      },
-      complete: () => {
-        this.nextStep();
-      },
-    });
-    console.log('engagement save', engagement);
   }
 
   loadEngagements() {
@@ -493,6 +475,7 @@ export class ProjetEngagementDetails implements OnInit {
       datation: avancementForm.controls['datation'].value,
       tauxType: avancementForm.controls['tauxType'].value,
       taux: avancementForm.controls['taux'].value,
+      commentaire: avancementForm.controls['commentaire'].value,
     };
   }
 
@@ -503,6 +486,7 @@ export class ProjetEngagementDetails implements OnInit {
       datation: avancementForm.controls['datation'].value,
       tauxType: avancementForm.controls['tauxType'].value,
       taux: avancementForm.controls['taux'].value,
+      commentaire: avancementForm.controls['commentaire'].value,
     };
   }
 
@@ -608,30 +592,16 @@ export class ProjetEngagementDetails implements OnInit {
     });
   }
 
-  getPartenaireLabel(structure: Structure): string {
-    return structure.nom;
-  }
-
-  getPartenaireValue(structure: any): any {
-    if (typeof structure === 'string') {
-      return {
-        nom: structure,
-        code: structure,
-        rattachement: null,
-      };
-    }
-    return {
-      id: structure.id,
-      nom: structure.nom,
-      code: structure.code,
-      rattachement: structure.rattachement,
-    };
+  protected suivant(pas: number) {
+    this.etape+=pas;
+    this.cdr.detectChanges();
   }
 
   protected nextStep(): void {
     this.etape = this.etape + 1;
     this.cdr.detectChanges();
   }
+
   protected previousStep(): void {
     console.log('previous step');
     this.etape = this.etape - 1;
@@ -689,15 +659,15 @@ export class ProjetEngagementDetails implements OnInit {
       complete: () => {
         console.log('enregistremnt ok');
 
-        //this.router.navigate(['/feuille-de-route']);
-        this.nextStep();
+        this.router.navigate(['/feuille-de-route']);
+        //this.nextStep();
       },
     });
   }
 
   enregistrerFinances() {
     const projetId: number = this.projetForm.controls['id'].value;
-    const financesForm=this.projetForm.get('finances') as FormGroup;
+    const financesForm = this.projetForm.get('finances') as FormGroup;
     const envTotale: number = financesForm.get('envTotale')?.value;
     const finePublic: number = financesForm.get('finePublic')?.value;
     const fineHorsBudget: number = financesForm.get('fineHorsBudget')?.value;
@@ -718,20 +688,20 @@ export class ProjetEngagementDetails implements OnInit {
     console.log('cibleHorsDakar', cibleHorsDakar);
     console.log('cibleTous', cibleTous);
 
-    const cibles:string[]=[];
+    const cibles: string[] = [];
 
-    if (cibleUrbains){
+    if (cibleUrbains) {
       cibles.push('Urbains');
     }
 
-    if (cibleRuraux){
+    if (cibleRuraux) {
       cibles.push('Ruraux');
     }
 
-    if (cibleFaiblesRevenus){
+    if (cibleFaiblesRevenus) {
       cibles.push('faibles revenus');
     }
-    if (cibleHorsDakar){
+    if (cibleHorsDakar) {
       cibles.push('Hors Dakar');
     }
 
@@ -739,25 +709,28 @@ export class ProjetEngagementDetails implements OnInit {
       cibles.push('Tous');
     }
 
-    const finances : ProjetFinanceDto={
+    const finances: ProjetFinanceDto = {
       projetId: projetId,
-      envTotale:envTotale,
+      envTotale: envTotale,
       finePublic: finePublic,
       fineHorsBudget: fineHorsBudget,
       maturite: maturite,
-      cibles:cibles
-    }
+      cibles: cibles,
+    };
     console.log('finances', finances);
     this.engagementService.saveFinances(finances).subscribe({
       error: (err) => {
-        this.msg=`${err}`;
+        this.msg = `${err}`;
         this.cdr.detectChanges();
       },
       complete: () => {
-        this.nextStep();
-      }
+        if (this.engagementProjet) {
+          this.engagementProjet.cibles = cibles;
+          this.nextStep();
+          this.loadListAvancementsAnnuels();
+        }
+      },
     });
-
   }
 
   private getSelectedIndicateurs(): string[] {
@@ -826,6 +799,39 @@ export class ProjetEngagementDetails implements OnInit {
       for (let i = 0; i < formArray.length; i++) {
         formArray[i]?.enable();
       }
+    }
+  }
+
+  protected onStepChange(activeIndex: number | undefined) {
+    console.log('onStepChange', activeIndex);
+    switch (activeIndex) {
+      case 6:
+        this.loadListAvancementsAnnuels();
+        break;
+    }
+  }
+
+  private loadListAvancementsAnnuels() {
+    this.chargementListExAntePostError = '';
+    this.listExAntePost = [];
+    if (this.engagementProjet) {
+      this.engagementService.loadRecap(this.engagementProjet.projetId).subscribe({
+        next: (data) => {
+          this.listExAntePost = data;
+          console.log('listProjetsAnnuels', data);
+        },
+        error: (err) => {
+          this.chargementListExAntePostError = `${err}`;
+          this.chargementListExAntePost = false;
+          this.cdr.detectChanges();
+        },
+        complete: () => {
+          this.chargementListExAntePost = false;
+          this.cdr.detectChanges();
+        },
+      });
+    } else {
+      this.chargementListExAntePostError = 'pas de projet selectionné';
     }
   }
 }

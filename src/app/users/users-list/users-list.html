@@ -5,10 +5,76 @@
   <p-table
     class="meantTable"
     dataKey="id"
+
+    [loading]="loading"
+    [columns]="selectedColumns"
     [value]="users">
     <ng-template #caption>
       <p-multiSelect display="chip" [options]="colonnes" [(ngModel)]="selectedColumns" optionLabel="entete" selectedItemsLabel="{0} columns selected" [style]="{ 'min-width': '200px' }" placeholder="Choose Columns" />
     </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td [colSpan]="selectedColumns.length" >
+          @if (authorized){
+            Aucun utilisateur trouvé
+          } @else {
+            <span class="text-danger fw-bold">Votre niveau d’accès ne vous permet pas de consulter cette page.x</span>
+          }
+        </td>
+      </tr>
+    </ng-template>
 
+    <ng-template pTemplate #header let-columns>
+      <tr>
+        @for (col of columns; track col.entete; let index=$index) {
+          <th class="entete" id="col_{{index}}"  >
+            <span>{{col.entete}}</span><br/>
+            @if (col.searchTxt){
+              <p-columnFilter
+                type="text"
+                field="{{col.champ}}"
+                matchMode="contains"
+                placeholder="{{col.searchTxt}}"
+                ariaLabel="Filter"
+                [showMenu]="false"
+                filterOn="input">
+              </p-columnFilter>
+            }
+          </th>
+        }
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate #loadingbody>
+      @for (item of [].constructor(6); track $index) {
+        <tr id="sket{{item}}">
+          @for (col of selectedColumns; track col.champ) {
+            <td><p-skeleton [height]="skeletonHeight" /></td>
+          }
+        </tr>
+      }
+    </ng-template>
+
+
+
+    <ng-template pTemplate  #body let-user let-rowIndex="rowIndex">
+      <tr
+        [class.selectedRow]="user.id===selectedUser?.id"
+        (click)="selectUser(user)"
+        [class.paire]="rowIndex%2==0">
+        @for (col of selectedColumns; track col.champ) {
+          <td>
+            @switch (col.champ){
+              @case ('axe.nom'){
+                toto
+              }
+              @default {
+                {{ utilService.getNestedValue(user,col.champ) }}
+              }
+            }
+          </td>
+        }
+
+    </ng-template>
   </p-table>
 </div>

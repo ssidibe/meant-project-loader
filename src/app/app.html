@@ -1,6 +1,5 @@
 <div class="layout">
 
-  <!-- HEADER -->
   <header class="shadow-sm align-items-center">
 
     <button class="btn btn-light me-3"
@@ -22,17 +21,18 @@
          [class.collapsed]="collapsed">
 
       <ul class="menu">
+        @if (false) {
+          <li class="menu-item">
+            <a routerLink="/pilotage" routerLinkActive="activeMenuItem">
+              <i class="bi bi-speedometer2"></i>
+              @if (!collapsed){
+                <span >
+                  Pilotage
+                </span>
+              }
+            </a>
+          </li>
 
-        <li class="menu-item">
-          <a routerLink="/pilotage" routerLinkActive="activeMenuItem">
-            <i class="bi bi-speedometer2"></i>
-            @if (!collapsed){
-              <span >
-                Pilotage
-              </span>
-            }
-          </a>
-        </li>
 
         <li>
           <a routerLink="/projets/list" routerLinkActive="activeMenuItem">
@@ -44,6 +44,7 @@
             }
           </a>
         </li>
+        }
         <li>
           <a routerLink="/projets/fiches" routerLinkActive="activeMenuItem">
             <i class="bi bi-file-earmark-pdf"></i>
@@ -59,34 +60,46 @@
         <li>
           <a routerLink="/feuille-de-route" routerLinkActive="activeMenuItem" >
             <!--img src="/images/contract-icon.svg" width="24x" alt="contrat"/-->
-            <i class="bi bi-pin-angle"></i>
+            <!--i class="bi bi-pin-angle"></i-->
+            <i class="bi bi-pin-map-fill"></i>
             @if (!collapsed){
               <span >
-              Feuille de route
+              Feuilles de route
             </span>
             }</a>
         </li>
 
-        <li>
-          <a routerLink="/users" routerLinkActive="activeMenuItem">
-            <i class="bi bi-people"></i>
-            @if (!collapsed){
-            <span >
-              Utilisateurs
-            </span>
-            }
-          </a>
-        </li>
+        @if (user && (user.roles.includes('ADMIN')||user.roles.includes('SUPERVISEUR'))){
+          <li>
+            <a routerLink="/users" routerLinkActive="activeMenuItem">
+              <i class="bi bi-people"></i>
+              @if (!collapsed){
+              <span >
+                Utilisateurs
+              </span>
+              }
+            </a>
+          </li>
+        }
       </ul>
 
 
       <!-- USER FOOTER -->
       <div class="user-footer"
            (click)="openLogoutModal()">
-        <span class="rounded-circle bg-secondary text-primary p-2">DS</span>
+        @if (user) {
+          <p-avatar class="bg-secondary text-white" label="{{user.prenom.charAt(0)}}{{user.nom.charAt(0)}}" shape="circle" ></p-avatar>
+        }
 
         @if (!collapsed) {
-        <span style="white-space: nowrap">Dr. Samba SIDIBE</span>
+          <span style="white-space: nowrap">
+            @if (user){
+              @if(user){
+               {{user.titre}}
+              }
+              {{user.prenom.charAt(0)}}. {{user.nom}}
+            }
+          </span>
         }
 
       </div>

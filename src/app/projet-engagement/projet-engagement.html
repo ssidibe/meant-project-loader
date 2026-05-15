@@ -35,6 +35,7 @@
         }
       </tr>
     </ng-template>
+
     <ng-template pTemplate  #body let-projet let-rowIndex="rowIndex">
       <tr
         [class.selectedRow]="projet.id===selectedProjet?.id"
@@ -46,7 +47,19 @@
         (click)="selectProjet(projet)">
         @for (col of selectedColumns; track col.champ) {
             <td>
-              {{ getNestedValue(projet,col.champ) }}
+              @switch (col.champ){
+                @case ('axe.nom'){
+                  <div class="small fw-bold">Axe {{projet.axe.numero}}</div>
+                  <div>{{projet.axe.nom}}</div>
+                }
+                @case ('os.nom'){
+                  <div class="small fw-bold">OS {{projet.axe.numero}}.{{projet.os.numero}}</div>
+                  <div>{{projet.os.nom}}</div>
+                }
+                @default {
+                  {{ getNestedValue(projet,col.champ) }}
+                }
+              }
             </td>
           }
 

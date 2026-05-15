@@ -1,0 +1,97 @@
+
+@if(loading){
+  <div>
+  <i class="text-primary pi pi-spin pi-cog" style="font-size: 2rem"></i> Chargement ...
+  </div>
+} @else {
+  @if (engagementProjet){
+    <form [formGroup]="projetForm">
+      <div class="p-2">
+        <table class="formTable">
+          <tr>
+            <th id="structure" class="detailsLabel">Structure : </th>
+            <td>{{ engagementProjet.porteur }}</td>
+          </tr>
+          <tr>
+            <td class="detailsLabel">Programme : </td>
+            <td>{{ engagementProjet.programme }}</td>
+          </tr>
+          <tr>
+            <td class="detailsLabel">Objectif stratégique : </td>
+            <td>{{ engagementProjet.osName }}</td>
+          </tr>
+
+          <tr>
+            <td class="detailsLabel">Axe : </td>
+            <td>{{ engagementProjet.axeName }}</td>
+          </tr>
+
+          <tr>
+            <td class="detailsLabel">Partenaires : </td>
+            <td>
+              <p-autoComplete
+                id="partenairesForm"
+                inputId="chips-combined"
+                [dropdown]="false"
+                formControlName="partenaires"
+                multiple fluid
+                [dataKey]="'id'"
+                [optionLabel]="utilService.getPartenaireLabel"
+                [optionValue]="utilService.getPartenaireValue"
+                [suggestions]="filteredPartenaires"
+                (completeMethod)="searchPartenaire($event)"
+                [addOnBlur]="true"
+                [addOnTab]="true" ></p-autoComplete>
+            </td>
+          </tr>
+
+          <!--tr>
+            <td class="detailsLabel">Résultats attendus : </td>
+            <td>{{ engagementProjet.axeName }}</td>
+          </tr-->
+
+          <tr>
+            <td class="detailsLabel">Début prévu projet : </td>
+            <td>
+              <p-datePicker appendTo="body" formControlName="debutPrevu" />
+            </td>
+          </tr>
+
+          <tr>
+            <td class="detailsLabel">Début effectif du projet : </td>
+            <td>
+              <p-datePicker appendTo="body" formControlName="debutEffectif" dateFormat="yy-mm-dd"  />
+            </td>
+          </tr>
+
+          <tr>
+            <td class="detailsLabel">Fin prévue du projet : </td>
+            <td>
+              <p-datePicker appendTo="body" formControlName="finPrevue" dateFormat="yy-mm-dd"/>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="detailsLabel">Fin effective du projet : </td>
+            <td>
+              <p-datePicker appendTo="body" formControlName="finEffective" dateFormat="yy-mm-dd"  />
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" class="text-end">
+              <span class="text-danger">{{msg}}</span>
+              <button
+                (click)="saveJalonProjet()"
+                class="btn btn-outline-primary m-2">
+                Enregistrer et continuer
+                <i class="bi bi-arrow-right ms-2"></i>
+              </button>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </form>
+  } @else {
+    pas de projet choisi
+  }
+}

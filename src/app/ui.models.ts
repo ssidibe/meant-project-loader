@@ -26,6 +26,7 @@ export interface AxeDto {
 
 export interface OsDto {
   id: number;
+  numero: number;
   nom: string;
   axeId: number;
 }
@@ -140,6 +141,7 @@ export interface AvancementProjetDto{
   projetId:number;
   tauxType:string;
   taux?:number;
+  commentaire?:string;
 }
 
 export interface AvancementProjetAnnuel {
@@ -158,14 +160,23 @@ export interface AvancementProjetAnnuel {
 export interface AvancementProjetAnnuelDto {
   annee: number;
   projetId: number;
-  t1Ante: number|null;
-  t2Ante: number|null;
-  t3Ante: number|null;
-  t4Ante: number|null;
-  t1Post: number|null;
-  t2Post: number|null;
-  t3Post: number|null;
-  t4Post: number|null;
+  t1Ante: number | undefined;
+  t2Ante: number | undefined;
+  t3Ante: number | undefined;
+  t4Ante: number | undefined;
+  t1Post: number | undefined;
+  t2Post: number | undefined;
+  t3Post: number | undefined;
+  t4Post: number | undefined;
+
+  t1AnteComm: string | undefined;
+  t2AnteComm: string | undefined;
+  t3AnteComm: string | undefined;
+  t4AnteComm: string | undefined;
+  t1PostComm: string | undefined;
+  t2PostComm: string | undefined;
+  t3PostComm: string | undefined;
+  t4PostComm: string | undefined;
 }
 
 export interface ToastMsg {
@@ -188,4 +199,15 @@ export interface ProjetFinanceDto {
   fineHorsBudget: number;
   maturite: number;
   cibles:string[];
+}
+
+export interface JalonProjetDto {
+  projetId: number;
+  porteur?: string;
+  partenaires: Structure[];
+  resultatsAttendus: string[];
+  debutPrevu: string;
+  debutEffectif: string;
+  finPrevue: string;
+  finEffective: string;
 }
