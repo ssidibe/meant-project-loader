@@ -1,0 +1,94 @@
+<form [formGroup]="projetForm">
+  <span class="h5">Année :</span>
+  <p-select
+    formControlName="annee"
+    [inputSize]="12"
+    [options]="annees"
+    style="width: 150px"
+    (onChange)="updateEngagementYear()"
+    placeholder="Choisir l'annee" class="h5 ms-2" />
+  <div class="text-danger ">{{msg}}</div>
+  @if(chargement){
+    <app-loading-data [loadingText]="'Chargement de l\'état d\'avancement du projet'"></app-loading-data>
+  } @else if (exAntes.length>0 && exPosts.length>0){
+
+    <div formArrayName="exAntes">
+      <div class="h3 border-bottom border-primary ">Ex-Ante (prévisions)</div>
+      <table class="mt-2 mb-2">
+        @for (exForm of exAntes.controls; let i = $index; track i) {
+          <tr [formGroupName]="i">
+            <th class="detailsLabel">Trimestres {{i+1}} :</th>
+            <td class="py-1">
+              <input formControlName="taux"
+                     [invalid]="exForm.touched && exForm.get('taux')?.invalid"
+                     pInputText
+                     pInputMask="9?99"
+                     style="width: 86px; text-align: right"
+                     placeholder="0 à 100"/> %
+            </td>
+            <td >
+              <p-floatlabel class="ms-4"  variant="on" >
+                <input
+                  id="comment_ant_{{i}}"
+                  formControlName="commentaire"
+                  style="min-width: 300px"
+                  pInputText
+                  fluid autocomplete="off" />
+                <label for="comment_ant_{{i}}">Commentaires</label>
+              </p-floatlabel>
+            </td>
+          </tr>
+        }
+      </table>
+
+    </div>
+    <div formArrayName="exPosts" >
+      <div class="h3 border-bottom border-primary">Ex-Post (Taux d'exécution)</div>
+      <table class="mt-2 mb-2">
+        @for (exForm of exPosts.controls; let i = $index; track i) {
+          <tr [formGroupName]="i">
+            <th class="detailsLabel pt-2">Trimestres {{i+1}} :</th>
+            <td class="py-1">
+              <input
+                formControlName="taux"
+                [invalid]="exForm.touched && exForm.get('taux')?.invalid"
+                pInputText
+                pInputMask="9?99"
+                style="width: 86px; text-align: right"
+                placeholder="0 à 100"/> %
+            </td>
+            <td>
+              <p-floatlabel class="ms-4"  variant="on" >
+                <input
+                  id="comment_post_{{i}}"
+                  formControlName="commentaire"
+                  style="min-width: 300px"
+                  pInputText fluid autocomplete="off"/>
+                <label for="comment_post_{{i}}">Commentaires</label>
+              </p-floatlabel>
+            </td>
+          </tr>
+        }
+      </table>
+    </div>
+
+    <div class="d-flex justify-content-between mt-3">
+      <button (click)="previousStep()" type="button" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>
+        Précédent
+      </button>
+      <button type="button" class="btn btn-outline-primary"
+              [disabled]="chargement || saving|| projetForm.get('exAntes')?.invalid || projetForm.get('exPosts')?.invalid"
+              (click)="enregistrerAvancement()">
+        Enregistrer et continuer
+        @if (saving){
+          <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        } @else {
+          <i class="bi bi-arrow-right ms-2"></i>
+        }
+      </button>
+    </div>
+  }
+</form>

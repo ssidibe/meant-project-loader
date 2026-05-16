@@ -96,3 +96,12 @@ main {
   width: 100%;
 }
 
+.meantErreur{
+  @extend .text-danger
+}
+
+.stepItem{
+  @extend .border;
+  @extend .rounded-3;
+}
+

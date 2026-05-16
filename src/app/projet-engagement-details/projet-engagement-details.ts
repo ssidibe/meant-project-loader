@@ -31,64 +31,39 @@ import { RecapIndicPilote } from '../fragments/recap-indic-pilote/recap-indic-pi
 import { XofFormatPipe } from '../xof-format-pipe';
 import { UtilService } from '../services/util-service';
 import { JalonsProjet } from '../fragments/jalons-projet/jalons-projet';
+import { ActivitesProjet } from '../fragments/activites-projet/activites-projet';
+import { EtatsAvancements } from '../fragments/etats-avancements/etats-avancements';
 
 
 @Component({
   selector: 'app-projet-engagement-details',
   imports: [
-    Dialog,
     TableModule,
     ReactiveFormsModule,
-    FloatLabel,
-    DatePicker,
-    Textarea,
-    AutoComplete,
     FormsModule,
     Stepper,
     StepList,
     StepPanels,
     Step,
     StepPanel,
-    InputText,
-    Select,
-    InputMaskDirective,
-    JsonPipe,
-    ExAntePostDetails,
-    RecapIndicPilote,
-    CurrencyPipe,
-    XofFormatPipe,
     JalonsProjet,
+    ActivitesProjet,
+    EtatsAvancements,
+    JsonPipe,
   ],
   templateUrl: './projet-engagement-details.html',
   styleUrl: './projet-engagement-details.scss',
 })
 export class ProjetEngagementDetails implements OnInit {
   etape: number = 1;
-  exTypes = ['EX_ANTE', 'EX_POST'];
-  maturites = ['Idée / intention', 'Études / préparation', 'Lancement', 'Avancé', 'Opérationnel'];
-  annees: number[] = [2024, 2025, 2026, 2027, 2028, 2029, 2031, 2032, 2033, 2034, 2035];
-  trimestreMonth = [2, 5, 8, 11];
   poucentWidth = '45px';
   poucentPlaceHolder = '00';
   avancementProjetAnnuel?: AvancementProjetAnnuel;
   indicateursSource: Indicateur[] | undefined;
-  chargementIndicateurs: boolean = false;
-  chargementListExAntePost: boolean = false;
-  chargementListExAntePostError: string = '';
-  listExAntePost: AvancementProjetAnnuelDto[] = [];
-
-  projetId: number | null = null;
-  engagementProjet?: EngagementProjetDto;
-  msg = '';
   chargement = false;
+  projetId: number | undefined;
+  maturites = ['Idée / intention', 'Études / préparation', 'Lancement', 'Avancé', 'Opérationnel'];
   chargementEngagement = false;
-
-  filteredPartenaires: Structure[] = [];
-  partenairesDb: Structure[] = [];
-
-  editMode = false;
-
-  chargementPartenaires: boolean = false;
 
   selectedActiviteForm: FormGroup<any> = new FormGroup({
     id: new FormControl(''),
@@ -138,12 +113,14 @@ export class ProjetEngagementDetails implements OnInit {
     exAntes: new FormArray([]),
     exPosts: new FormArray([]),
   });
+  engagementProjet?: EngagementProjetDto;
+  msg: string = '';
+  private chargementIndicateurs: boolean = false;
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly engagementService: EngagementService,
-    protected readonly utilService: UtilService,
     private readonly cdr: ChangeDetectorRef,
   ) {}
 
@@ -152,14 +129,14 @@ export class ProjetEngagementDetails implements OnInit {
       const paramId = params.get('id');
       if (paramId) {
         this.projetId = +paramId;
-        this.chargerDonnees(this.projetId, new Date().getFullYear());
+        this.chargerDonnees(this.projetId);
       }
-      this.loadPartenaireDb();
     });
   }
 
-  private chargerDonnees(projetId: number, year: number) {
-    this.setChargement(true);
+  private chargerDonnees(projetId: number) {
+    this.setLoading(true);
+    this.msg='';
     this.engagementService.getEngagementByProjetId(projetId).subscribe({
       next: (engagementProjet: EngagementProjetDto) => {
         console.log('donnees reçu', engagementProjet);
@@ -167,85 +144,31 @@ export class ProjetEngagementDetails implements OnInit {
       },
       error: (error) => {
         console.error('error', error);
-        const status = error.status;
-        if (status === 454) {
-          this.msg = `Engagement du projet id=${projetId} introuvable`;
-        } else {
-          console.error(`Erreur code : ${status}, ${error}`);
-          this.msg = `Erreur code : ${status}`;
+        switch (error.status) {
+          case 0:
+            this.msg =
+              "Problème de connexion au serveur. Vérifiez votre connexion. Si le problème persiste, contactez l'administrateur.";
+            break;
+          case 454:
+            this.msg = `Le serveur chargé de faire le traitement est hors service`;
+            break;
+          case 503:
+            this.msg = `Projet id=${projetId} introuvable`;
+            break;
+          default:
+            this.msg = `Erreur code : ${status}`;
         }
-        this.setChargement(false);
+        console.error(this.msg);
+        this.setLoading(false);
       },
       complete: () => {
         console.log('done');
-        this.loadForm();
-        this.setChargement(false);
-        this.chargementsEngagementFromApi(projetId, year);
+        ////////this.loadForm();
+        console.log('engagement projet', this.engagementProjet);
+        this.setLoading(false);
+        //this.chargementsEngagementFromApi(projetId, year);
       },
     });
-
-    console.log('getEngagementTauxProjetId ', projetId, year);
-  }
-
-  chargementsEngagementFromApi(projetId: number, year: number) {
-    this.setChargementEngagement(true);
-    this.projetForm.get('annee')?.setValue(year);
-    this.exAntes.clear();
-    this.exPosts.clear();
-    this.engagementService.getEngagementTauxProjetId(projetId, year).subscribe({
-      next: (data) => {
-        console.log('data', data);
-
-        this.exTypes.forEach((exType) => {
-          this.trimestreMonth.forEach((mois) => {
-            const avancementProjet = data.find(
-              (a) => new Date(a.datation).getMonth() === mois && a.tauxType === exType,
-            ) ?? {
-              datation: new Date(year, mois, 1),
-              projetId: projetId,
-              tauxType: exType,
-            };
-            console.log('avancementProjet', avancementProjet);
-
-            const form = new FormGroup({
-              projetId: new FormControl(avancementProjet.projetId),
-              datation: new FormControl(avancementProjet.datation),
-              tauxType: new FormControl(avancementProjet.tauxType),
-              taux: new FormControl(avancementProjet.taux, [
-                Validators.min(0),
-                Validators.max(100),
-              ]),
-              commentaire: new FormControl(avancementProjet.commentaire),
-            });
-            if (avancementProjet.tauxType === 'EX_ANTE') {
-              console.log('ex-ante');
-              this.exAntes.push(form);
-            } else if (avancementProjet.tauxType === 'EX_POST') {
-              console.log('ex-post');
-              this.exPosts.push(form);
-            }
-          });
-        });
-      },
-      error: (error) => {
-        console.log('error', error);
-        this.setChargementEngagement(false);
-      },
-      complete: () => {
-        console.log('nb', this.exAntes.controls.length);
-        this.setChargementEngagement(false);
-      },
-    });
-  }
-
-  private setChargement(chargement: boolean) {
-    this.chargement = chargement;
-    this.cdr.detectChanges();
-  }
-
-  private setChargementEngagement(chargement: boolean) {
-    this.chargementEngagement = chargement;
-    this.cdr.detectChanges();
   }
 
   private loadForm() {
@@ -300,7 +223,7 @@ export class ProjetEngagementDetails implements OnInit {
 
       this.loadEngagements();
       this.engagementProjet.actions.forEach((action) => {
-        this.addActivite(action);
+        /////////this.addActivite(action);
       });
     } else {
       this.selectedActiviteForm = new FormGroup({
@@ -444,156 +367,8 @@ export class ProjetEngagementDetails implements OnInit {
     return this.getFocusForm(epI, domI).at(focI).get('indicateurs') as FormArray;
   }
 
-  // Getter for form array
-  get activites(): FormArray {
-    return this.projetForm.get('activites') as FormArray;
-  }
-
-  // Add a new action field
-  addActivite(action: Action): void {
-    const formGroup = new FormGroup({
-      nom: new FormControl(action.nom, Validators.required),
-      porteur: new FormControl(action.porteur, Validators.required),
-      partenaires: new FormControl<string[]>(action.partenaires, Validators.required),
-      resultatsAttendus: new FormControl<string[]>(action.resultatsAttendus, Validators.required),
-      debutPrevu: new FormControl(action.debutPrevu, [Validators.required]),
-      debutEffectif: new FormControl(action.debutEffectif, [Validators.required]),
-      finPrevue: new FormControl(action.finPrevue, [Validators.required]),
-      finEffective: new FormControl(action.finEffective, [Validators.required]),
-    });
-    this.activites.push(formGroup);
-  }
-
-  get exAntes(): FormArray {
-    return this.projetForm.get('exAntes') as FormArray;
-  }
-
-  exAntesAt(index: number): AvancementProjetDto {
-    const avancementForm = this.exAntes.at(index) as FormGroup;
-    return {
-      projetId: this.projetForm.controls['id'].value,
-      datation: avancementForm.controls['datation'].value,
-      tauxType: avancementForm.controls['tauxType'].value,
-      taux: avancementForm.controls['taux'].value,
-      commentaire: avancementForm.controls['commentaire'].value,
-    };
-  }
-
-  exPostsAt(index: number): AvancementProjetDto {
-    const avancementForm = this.exPosts.at(index) as FormGroup;
-    return {
-      projetId: this.projetForm.controls['id'].value,
-      datation: avancementForm.controls['datation'].value,
-      tauxType: avancementForm.controls['tauxType'].value,
-      taux: avancementForm.controls['taux'].value,
-      commentaire: avancementForm.controls['commentaire'].value,
-    };
-  }
-
-  get exPosts(): FormArray {
-    return this.projetForm.get('exPosts') as FormArray;
-  }
-
-  editSelectedActivite() {
-    this.editMode = true;
-  }
-
-  private hideEdit() {
-    this.editMode = false;
-  }
-
-  newActivite() {
-    const porteurName = this.engagementProjet?.porteur ? this.engagementProjet?.porteur : '';
-    let porteur: Structure | undefined;
-    if (porteurName) {
-      porteur = this.partenairesDb.find((p) => p.nom === porteurName || p.code === porteurName);
-    }
-    this.selectedActiviteForm = new FormGroup({
-      id: new FormControl(''),
-      index: new FormControl(''),
-      activite: new FormControl('', Validators.required),
-      porteur: new FormControl<Structure>(
-        porteur ?? { nom: '', code: '', rattachement: null },
-        Validators.required,
-      ),
-      partenaires: new FormControl<string[]>([], Validators.required),
-      resultatsAttendus: new FormControl<string[]>([], Validators.required),
-      debutPrevu: new FormControl('', [Validators.required]),
-      debutEffectif: new FormControl('', [Validators.required]),
-      finPrevue: new FormControl('', [Validators.required]),
-      finEffective: new FormControl('', [Validators.required]),
-    });
-    this.editMode = true;
-  }
-
-  protected saveActivite() {
-    const activite: ActiviteDto = {
-      projetId: this.projetForm.controls['id'].value,
-      nom: this.selectedActiviteForm.controls['activite'].value,
-      porteur: this.selectedActiviteForm.controls['porteur'].value,
-      partenaires: this.selectedActiviteForm.controls['partenaires'].value,
-      resultatsAttendus: this.selectedActiviteForm.controls['resultatsAttendus'].value,
-      debutEffectif: this.selectedActiviteForm.controls['debutEffectif'].value,
-      debutPrevu: this.selectedActiviteForm.controls['debutPrevu'].value,
-      finPrevue: this.selectedActiviteForm.controls['finPrevue'].value,
-      finEffective: this.selectedActiviteForm.controls['finEffective'].value,
-    };
-    console.log('activite save', activite);
-    this.engagementService.createActivite(activite).subscribe({
-      next: (data) => {
-        this.engagementProjet = data;
-      },
-      complete: () => {
-        this.loadForm();
-        this.hideEdit();
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.log('error', err);
-      },
-    });
-  }
-
-  searchPartenaire(event: any) {
-    const ori = event.query || '';
-    const query = ori.toLowerCase();
-    if (query) {
-      this.filteredPartenaires = this.partenairesDb.filter(
-        (p) => p.code.toLowerCase().includes(query) || p.nom.toLowerCase().includes(query),
-      );
-      let structure = this.partenairesDb.find(
-        (p) => p.code.toLowerCase() === query || p.nom.toLowerCase() === query,
-      );
-      if (!structure) {
-        this.filteredPartenaires.unshift({
-          nom: ori.trim(),
-          code: ori.trim(),
-          rattachement: null,
-        });
-      }
-    } else {
-      this.filteredPartenaires = [...this.partenairesDb];
-    }
-  }
-
-  loadPartenaireDb() {
-    this.chargementPartenaires = true;
-    this.engagementService.getAllPartenaires().subscribe({
-      next: (data) => {
-        this.partenairesDb = data;
-      },
-      error: (err) => {
-        this.partenairesDb = [];
-        this.chargementPartenaires = false;
-      },
-      complete: () => {
-        this.chargementPartenaires = false;
-      },
-    });
-  }
-
   protected suivant(pas: number) {
-    this.etape+=pas;
+    this.etape += pas;
     this.cdr.detectChanges();
   }
 
@@ -606,44 +381,6 @@ export class ProjetEngagementDetails implements OnInit {
     console.log('previous step');
     this.etape = this.etape - 1;
     this.cdr.detectChanges();
-  }
-
-  enregistrerAvancement() {
-    const annee: number = this.projetForm.controls['annee'].value;
-    const projetId: number = this.projetForm.controls['id'].value;
-    const avancements: AvancementProjetDto[] = [];
-    for (let i = 0; i < 4; i++) {
-      avancements.push(this.exAntesAt(i));
-      avancements.push(this.exPostsAt(i));
-    }
-    this.engagementService.saveAvancements(projetId, annee, avancements).subscribe({
-      error: (err) => {
-        console.log('erreur status ', err.status);
-        this.msg = `Erreur code :${err.status}`;
-      },
-      complete: () => {
-        //this.router.navigate(['/feuille-de-route']);
-        this.nextStep();
-      },
-    });
-  }
-
-  protected updateEngagementYear() {
-    console.log('updateEngagementYear');
-    const year = this.projetForm.get('annee')?.value;
-    this.exAntes.clear();
-    this.exPosts.clear();
-    if (this.projetId && year) {
-      this.chargementsEngagementFromApi(this.projetId, year);
-    }
-  }
-
-  protected rechargementsEngagementFromApi() {
-    let year: number = this.projetForm.get('annee')?.value;
-    let projetId = this.projetForm.get('id')?.value;
-    if (year && projetId) {
-      this.chargementsEngagementFromApi(projetId, year);
-    }
   }
 
   enregistrerIndicateurs() {
@@ -727,7 +464,7 @@ export class ProjetEngagementDetails implements OnInit {
         if (this.engagementProjet) {
           this.engagementProjet.cibles = cibles;
           this.nextStep();
-          this.loadListAvancementsAnnuels();
+          //////this.loadListAvancementsAnnuels();
         }
       },
     });
@@ -806,32 +543,13 @@ export class ProjetEngagementDetails implements OnInit {
     console.log('onStepChange', activeIndex);
     switch (activeIndex) {
       case 6:
-        this.loadListAvancementsAnnuels();
+        ///this.loadListAvancementsAnnuels();
         break;
     }
   }
 
-  private loadListAvancementsAnnuels() {
-    this.chargementListExAntePostError = '';
-    this.listExAntePost = [];
-    if (this.engagementProjet) {
-      this.engagementService.loadRecap(this.engagementProjet.projetId).subscribe({
-        next: (data) => {
-          this.listExAntePost = data;
-          console.log('listProjetsAnnuels', data);
-        },
-        error: (err) => {
-          this.chargementListExAntePostError = `${err}`;
-          this.chargementListExAntePost = false;
-          this.cdr.detectChanges();
-        },
-        complete: () => {
-          this.chargementListExAntePost = false;
-          this.cdr.detectChanges();
-        },
-      });
-    } else {
-      this.chargementListExAntePostError = 'pas de projet selectionné';
-    }
+  private setLoading(loading: boolean) {
+    this.chargement = loading;
+    this.cdr.detectChanges();
   }
 }

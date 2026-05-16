@@ -22,4 +22,5 @@ export class ExAntePostDetails {
   protected getValue(exAntePost: number): string {
     return exAntePost >= 0 && exAntePost < 10 ? `0${exAntePost}%` : `${exAntePost}%`;
   }
+
 }

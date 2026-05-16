@@ -1,8 +1,6 @@
 
 @if(loading){
-  <div>
-  <i class="text-primary pi pi-spin pi-cog" style="font-size: 2rem"></i> Chargement ...
-  </div>
+  <app-loading-data [loadingClass]="'text-danger'"></app-loading-data>
 } @else {
   @if (engagementProjet){
     <form [formGroup]="projetForm">

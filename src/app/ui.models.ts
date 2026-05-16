@@ -112,14 +112,14 @@ export interface ProjetListView {
 export interface ActiviteDto {
   id?: number;
   nom: string;
-  porteur?: Structure;
-  partenaires?: Structure[];
-  resultatsAttendus?: string[];
+  porteur: Structure | null | undefined;
+  partenaires: Structure[] | null | undefined;
+  resultatsAttendus: string[] | null | undefined;
   projetId: number;
-  debutPrevu?: string;
-  debutEffectif?: string;
-  finPrevue?: string;
-  finEffective?: string;
+  debutPrevu: string | null | undefined;
+  debutEffectif: string | null | undefined;
+  finPrevue: string | null | undefined;
+  finEffective?: string | null | undefined;
 }
 
 export interface RemplissageActivite {

@@ -13,12 +13,13 @@ import { EngagementProjetDto, Structure } from '../../domain.models';
 import { UtilService } from '../../services/util-service';
 import { EngagementService } from '../../services/engagement-service';
 import { JalonProjetDto } from '../../ui.models';
+import { LoadingData } from '../loading-data/loading-data';
 
 
 
 @Component({
   selector: 'app-jalons-projet',
-  imports: [AutoComplete, DatePicker, FormsModule, ReactiveFormsModule],
+  imports: [AutoComplete, DatePicker, FormsModule, ReactiveFormsModule, LoadingData],
   templateUrl: './jalons-projet.html',
   styleUrl: './jalons-projet.scss',
 })
@@ -161,7 +162,7 @@ export class JalonsProjet implements OnInit {
         complete: () => {
           //this.nextStep();
           console.log('enregistrement ok ', jalonDto);
-          this.etapeEmitter.emit(1)
+          this.etapeEmitter.emit(1);
         },
       });
     }

@@ -1,1 +1,193 @@
-<p>activites-projet works!</p>
+<form [formGroup]="projetForm">
+<div formArrayName="activites" class="mt-5">
+  <div class="h5 m-2">
+    Liste des activités du projet
+    <i (click)="newActivite()"
+       (keyup)="newActivite()"
+       style="cursor: pointer"
+       class="pi pi-plus-circle text-primary ms-2"></i>
+  </div>
+  <p-table showGridlines [value]="activites.value" [tableStyle]="{ 'min-width': '50rem' }">
+    <ng-template #header>
+
+      <tr>
+        <th id="activite" class="enteteTab">Activité</th>
+        <th id="porteur" class="enteteTab">Porteur</th>
+        <th id="partenaires" class="enteteTab">Partenaires</th>
+        <th id="debutPrevu" class="enteteTab">Début prévu activité</th>
+        <th id="debutReel" class="enteteTab">Début effectif</th>
+        <th id="finPrevue" class="enteteTab">Fin prévue activité</th>
+        <th id="finReelle" class="enteteTab">Fin effective</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-activite let-i="rowIndex">
+      <tr>
+        <td>
+          {{activite.nom}}
+        </td>
+        <td>
+          {{activite.porteur}}
+        </td>
+        <td class="p-0">
+          @for (p of activite.partenaires; track p; let iP = $index, isFirst = $first) {
+            <div [class.border-top]="!isFirst">{{p}}</div>
+          }
+        </td>
+        <td>
+          {{activite.debutPrevu}}
+        </td>
+        <td>
+          {{activite.debutEffectif}}
+        </td>
+        <td>
+          {{activite.finPrevue }}
+        </td>
+        <td>
+          {{activite.finEffective}}
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <div class="d-flex justify-content-between mt-3">
+    <button (click)="previous()" type="button" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-2"></i>
+      Précédent
+    </button>
+    <button (click)="save()" type="button" class="btn btn-outline-primary">
+      Continuer
+      <i class="bi bi-arrow-right ms-2"></i>
+    </button>
+  </div>
+</div>
+</form>
+
+<p-dialog [modal]="true" [(visible)]="editMode" [style]="{ width: '60rem'}">
+  <ng-template #header>
+    <div class="inline-flex items-center justify-center gap-2 h4 fw-bold">
+      @if(selectedActiviteForm.get('id')?.value ){
+        <span class="p-text-secondary block mb-8">Modification activité</span>
+      } @else {
+        <span class="p-text-secondary block mb-8">Ajout nouvelle activité</span>
+      }
+    </div>
+  </ng-template>
+
+  <form [formGroup]="selectedActiviteForm">
+    <div class="row">
+      <div class="col-12">
+        <p-floatlabel class="my-2" variant="on">
+          <textarea formControlName="activite" id="activiteSelected" pInputTextarea autocomplete="off" style="width: 100%;" ></textarea>
+          <label for="activiteSelected">Nom de l'activité</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-12">
+        <p-floatlabel class="mt-2 mb-0"  variant="on">
+          <p-autoComplete
+            id="porteurActiviteForm"
+            inputId="chips-combined"
+            appendTo="body"
+            [dropdown]="false"
+            formControlName="porteur"
+            [dataKey]="'id'"
+            [fluid]="true"
+            [optionLabel]="utilService.getPartenaireLabel"
+            [optionValue]="utilService.getPartenaireValue"
+            [suggestions]="filteredPartenaires"
+            (completeMethod)="searchPartenaire($event)"
+            [addOnBlur]="true"
+            [addOnTab]="true" ></p-autoComplete>
+          <label for="porteurActiviteForm">Porteur de l'activité</label>
+        </p-floatlabel>
+        <div class="small fst-italic mt-0 mb-2">utiliser la touche tabulation comme séparateur des partenaires</div>
+      </div>
+
+
+
+      <div class="col-12">
+        <p-floatlabel class="mt-2 mb-0"  variant="on">
+          <p-autoComplete
+            id="partenairesActiviteForm"
+            inputId="chips-combined"
+            appendTo="body"
+            [dropdown]="false"
+            formControlName="partenaires"
+            [dataKey]="'id'"
+            [fluid]="true"
+            [optionLabel]="utilService.getPartenaireLabel"
+            [optionValue]="utilService.getPartenaireValue"
+            [suggestions]="filteredPartenaires"
+            (completeMethod)="searchPartenaire($event)"
+            [addOnBlur]="true"
+            [multiple]="true"
+            [addOnTab]="true" ></p-autoComplete>
+          <label for="partenairesActiviteForm">Partenaires</label>
+        </p-floatlabel>
+        <div class="small fst-italic mt-0 mb-2">utiliser la touche tabulation comme séparateur des partenaires</div>
+      </div>
+
+      <div class="col-12">
+        <p-floatlabel class="mt-2 mb-0"  variant="on">
+          <p-autoComplete
+            id="resultatsAttendusForm"
+            inputId="chips-combined"
+            appendTo="body"
+            formControlName="resultatsAttendus"
+            multiple fluid [typeahead]="false"
+            [addOnBlur]="true"
+            [addOnTab]="true" ></p-autoComplete>
+          <label for="resultatsAttendusForm">Lister les résultats attendus</label>
+        </p-floatlabel>
+        <div class="small fst-italic mt-0 mb-4">utiliser la touche tabulation comme séparateur des résultats attendus</div>
+      </div>
+
+      <div class="col-6">
+        <p-floatlabel variant="on" class="my-2">
+          <p-datePicker
+            appendTo="body"
+            formControlName="debutPrevu"
+            inputId="debutPrevu"
+            showIcon iconDisplay="input" dateFormat="yy-mm-dd" />
+          <label for="debutPrevu">Début prévu de l'activité</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-6">
+        <p-floatlabel variant="on" class="my-2">
+          <p-datePicker
+            appendTo="body"
+            formControlName="debutEffectif"
+            inputId="debutEffectif" showIcon iconDisplay="input" dateFormat="yy-mm-dd" />
+          <label for="debutEffectif">Début réel de l’activité</label>
+        </p-floatlabel>
+      </div>
+      <div class="col-6">
+        <p-floatlabel variant="on" class="my-2">
+          <p-datePicker
+            appendTo="body"
+            formControlName="finPrevue"
+            inputId="finPrevue" showIcon iconDisplay="input" dateFormat="yy-mm-dd" />
+          <label for="finPrevue">Fin prévue de l'activité</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-6">
+        <p-floatlabel variant="on" class="my-2">
+          <p-datePicker
+            appendTo="body"
+            formControlName="finEffective"
+            inputId="finEffective" showIcon iconDisplay="input" dateFormat="yy-mm-dd" />
+          <label for="finEffective">Fin réelle de l’activité</label>
+        </p-floatlabel>
+      </div>
+    </div>
+  </form>
+
+  <div style="text-align: right" >
+    <button
+      class="btn btn-primary mt-3"
+      [disabled]="selectedActiviteForm.get('activite')?.invalid"
+      (click)="saveActivite()">Enregistrer</button>
+  </div>
+</p-dialog>
