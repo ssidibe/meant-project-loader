@@ -1,0 +1,88 @@
+
+<div class="mb-3" >
+  <div class="fw-bold h4 text-primary mb-0">Cochez les indicateurs que votre projet contribue à améliorer</div>
+  <div class="fst-italic text-danger mt-0">Vous pouvez en sélectionner plusieurs</div>
+</div>
+@if(loading){
+  <app-loading-data [loadingText]="'Chargement de l\'état d\'avancement du projet'"></app-loading-data>
+}@else{
+  <form [formGroup]="projetForm">
+    <div formArrayName="engagementsPopu">
+      <div class="border-bottom">
+        @for (epForm of engagesPopu.controls; let epI = $index; track epI){
+          <div [formGroupName]="epI">
+            <div role="button" class="fw-bold " (click)="onClickEngagPop(epI)">
+              <i class="bi "
+                 [class.bi-caret-right-fill]="!epForm.get('expanded')?.value"
+                 [class.bi-caret-down-fill]="epForm.get('expanded')?.value"></i>
+              <span>{{epForm.get('nom')?.value}}</span>
+            </div>
+
+            @if (epForm.get('expanded')?.value) {
+              <div formArrayName="domaines" >
+                @for (domainForm of getDomainesPrioritaires(epI).controls ; let domI = $index; track domI){
+                  <div [formGroupName]="domI">
+                    <div (click)="onClickDomainePrio(epI,domI)" role="button" class="ms-4">
+                      <i class="bi "
+                         [class.bi-caret-right-fill]="!domainForm.get('expanded')?.value"
+                         [class.bi-caret-down-fill]="domainForm.get('expanded')?.value"></i>
+                      <span>{{domainForm.get('nom')?.value}}</span>
+                    </div>
+
+                    @if (domainForm.get('expanded')?.value){
+                      <div formArrayName="focusList">
+                        @for (focusForm of getFocusForm(epI,domI).controls ; let focI = $index; track focI){
+                          <div [formGroupName]="focI" class="ps-4">
+
+                            <div role="button" class="ms-4" (click)="onClickFocus(epI,domI,focI)">
+                              <i class="bi "
+                                 [class.bi-caret-right-fill]="!focusForm.get('expanded')?.value"
+                                 [class.bi-caret-down-fill]="focusForm.get('expanded')?.value"></i>
+                              <span>{{focusForm.get('nom')?.value}}</span>
+                            </div>
+
+                            @if (focusForm.get('expanded')?.value){
+                              <div formArrayName="indicateurs">
+                                @for (indicForm of getIndicForm(epI,domI,focI).controls ; let indicI = $index; track indicI){
+                                  <div [formGroupName]="indicI" class="ps-4">
+                                    <div class="form-check form-switch mb-3 ms-4">
+                                      <input
+                                        formControlName="selected"
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        role="switch" id="focChecked{{epI}}{{domI}}{{focI}}{{indicI}}">
+                                      <label class="form-check-label" for="focChecked{{epI}}{{domI}}{{focI}}{{indicI}}">{{indicForm.get('nom')?.value}}</label>
+                                    </div>
+                                  </div>
+                                }
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+          </div>
+        }
+      </div>
+    </div>
+    <div class="d-flex justify-content-between mt-3">
+      <button (click)="previousStep()" type="button" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>
+        Précédent
+      </button>
+      <button
+        [disabled]="loading"
+        (click)="enregistrerIndicateurs()"
+        type="button"
+        class="btn btn-outline-primary">
+        Continuer
+        <i class="bi bi-arrow-right ms-2"></i>
+      </button>
+    </div>
+  </form>
+}
