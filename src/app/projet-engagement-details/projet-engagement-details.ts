@@ -30,6 +30,7 @@ import { JalonsProjet } from '../fragments/jalons-projet/jalons-projet';
 import { ActivitesProjet } from '../fragments/activites-projet/activites-projet';
 import { EtatsAvancements } from '../fragments/etats-avancements/etats-avancements';
 import { IndicPilotage } from '../fragments/indic-pilotage/indic-pilotage';
+import { FinancementsProjet } from '../fragments/financements-projet/financements-projet';
 
 
 @Component({
@@ -47,6 +48,7 @@ import { IndicPilotage } from '../fragments/indic-pilotage/indic-pilotage';
     ActivitesProjet,
     EtatsAvancements,
     IndicPilotage,
+    FinancementsProjet,
   ],
   templateUrl: './projet-engagement-details.html',
   styleUrl: './projet-engagement-details.scss',
@@ -59,7 +61,6 @@ export class ProjetEngagementDetails implements OnInit {
   indicateursSource: Indicateur[] | undefined;
   chargement = false;
   projetId: number | undefined;
-  maturites = ['Idée / intention', 'Études / préparation', 'Lancement', 'Avancé', 'Opérationnel'];
   chargementEngagement = false;
 
   selectedActiviteForm: FormGroup<any> = new FormGroup({
@@ -254,8 +255,6 @@ export class ProjetEngagementDetails implements OnInit {
     this.cdr.detectChanges();
   }
 
-
-
   protected suivant(pas: number) {
     this.etape += pas;
     this.cdr.detectChanges();
@@ -272,73 +271,7 @@ export class ProjetEngagementDetails implements OnInit {
     this.cdr.detectChanges();
   }
 
-  enregistrerFinances() {
-    const projetId: number = this.projetForm.controls['id'].value;
-    const financesForm = this.projetForm.get('finances') as FormGroup;
-    const envTotale: number = financesForm.get('envTotale')?.value;
-    const finePublic: number = financesForm.get('finePublic')?.value;
-    const fineHorsBudget: number = financesForm.get('fineHorsBudget')?.value;
-    const maturite: number = financesForm.get('maturite')?.value;
-    const cibleUrbains: boolean = financesForm.get('cibleUrbains')?.value;
-    const cibleRuraux: boolean = financesForm.get('cibleRuraux')?.value;
-    const cibleFaiblesRevenus: boolean = financesForm.get('cibleFaiblesRevenus')?.value;
-    const cibleHorsDakar: boolean = financesForm.get('cibleHorsDakar')?.value;
-    const cibleTous: boolean = financesForm.get('cibleTous')?.value;
 
-    console.log('envTotale', envTotale);
-    console.log('finePublic', finePublic);
-    console.log('fineHorsBudget', fineHorsBudget);
-    console.log('maturite', maturite);
-    console.log('cibleUrbains', cibleUrbains);
-    console.log('cibleRuraux', cibleRuraux);
-    console.log('cibleFaiblesRevenus', cibleFaiblesRevenus);
-    console.log('cibleHorsDakar', cibleHorsDakar);
-    console.log('cibleTous', cibleTous);
-
-    const cibles: string[] = [];
-
-    if (cibleUrbains) {
-      cibles.push('Urbains');
-    }
-
-    if (cibleRuraux) {
-      cibles.push('Ruraux');
-    }
-
-    if (cibleFaiblesRevenus) {
-      cibles.push('faibles revenus');
-    }
-    if (cibleHorsDakar) {
-      cibles.push('Hors Dakar');
-    }
-
-    if (cibleTous) {
-      cibles.push('Tous');
-    }
-
-    const finances: ProjetFinanceDto = {
-      projetId: projetId,
-      envTotale: envTotale,
-      finePublic: finePublic,
-      fineHorsBudget: fineHorsBudget,
-      maturite: maturite,
-      cibles: cibles,
-    };
-    console.log('finances', finances);
-    this.engagementService.saveFinances(finances).subscribe({
-      error: (err) => {
-        this.msg = `${err}`;
-        this.cdr.detectChanges();
-      },
-      complete: () => {
-        if (this.engagementProjet) {
-          this.engagementProjet.cibles = cibles;
-          this.nextStep();
-          //////this.loadListAvancementsAnnuels();
-        }
-      },
-    });
-  }
 
   protected onStepChange(activeIndex: number | undefined) {
     console.log('onStepChange', activeIndex);
@@ -352,32 +285,5 @@ export class ProjetEngagementDetails implements OnInit {
   private setLoading(loading: boolean) {
     this.chargement = loading;
     this.cdr.detectChanges();
-  }
-
-  protected cibleTousChanged(event: Event) {
-    const financeForm = this.projetForm.get('finances') as FormGroup;
-    const cibleTousForm = financeForm?.get('cibleTous');
-    const cibleUrbainsForm = financeForm?.get('cibleUrbains');
-    const cibleRurauxForm = financeForm?.get('cibleRuraux');
-    const cibleFaiblesRevenusForm = financeForm?.get('cibleFaiblesRevenus');
-    const cibleHorsDakarForm = financeForm?.get('cibleHorsDakar');
-    const cibleVal: boolean = cibleTousForm?.value;
-
-    const formArray = [
-      cibleUrbainsForm,
-      cibleRurauxForm,
-      cibleFaiblesRevenusForm,
-      cibleHorsDakarForm,
-    ];
-    if (cibleVal) {
-      for (let i = 0; i < formArray.length; i++) {
-        formArray[i]?.setValue(true);
-        formArray[i]?.disable();
-      }
-    } else {
-      for (let i = 0; i < formArray.length; i++) {
-        formArray[i]?.enable();
-      }
-    }
   }
 }

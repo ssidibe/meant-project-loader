@@ -61,86 +61,17 @@
 
             </p-step-panel>
 
-<!--
+
             <p-step-panel [value]="5">
               <ng-template #content let-activateCallback="activateCallback">
-                <div class="mb-3" >
-                  <div class="fw-bold h4 text-primary mb-0">Aspects financiers et opérationnels</div>
-                  <div class="fst-italic text-danger mt-0">Remplir les ressources budgétaires, le niveau de maturité et les bénéficiaires</div>
-                </div>
-
-                <div formGroupName="finances">
-
-                  <div class="form-floating mb-3">
-                    <input formControlName="envTotale" type="number" class="form-control" id="envTotalInput" placeholder="">
-                    <label for="envTotalInput">Enveloppe totale</label>
-                  </div>
-
-                  <div class="form-floating mb-3">
-                    <input formControlName="finePublic" type="number" class="form-control" id="financePublicInput" placeholder="">
-                    <label for="financePublicInput">Financement public</label>
-                  </div>
-
-                  <div class="form-floating mb-3">
-                    <input formControlName="fineHorsBudget" type="number" class="form-control" id="financeHorsBudgetInput" placeholder="">
-                    <label for="financeHorsBudgetInput">Financement hors-budget</label>
-                  </div>
-
-                  <div class="form-floating mb-3">
-                    <select formControlName="maturite" class="form-select" id="maturiteSelect" aria-label="Floating label select example">
-                      <option value="">Choisir</option>
-                      @for (m of maturites; track $index){
-                        <option [value]="m">{{m}}</option>
-                      }
-                    </select>
-                    <label for="maturiteSelect">Maturité du projet</label>
-                  </div>
-
-                  <div class="border rounded p-2">
-                    <div>Population cible</div>
-
-                    <div class="form-check form-switch mb-3">
-                      <input (change)="cibleTousChanged($event)" formControlName="cibleTous" class="form-check-input" type="checkbox" role="switch" id="switchCheckChecked">
-                      <label class="form-check-label" for="switchCheckChecked">Tous</label>
-                    </div>
-
-                    <div class="form-check form-switch mb-3">
-                      <input formControlName="cibleHorsDakar" class="form-check-input" type="checkbox" role="switch" id="switchCheckChecked">
-                      <label class="form-check-label" for="switchCheckChecked">Hors Dakar</label>
-                    </div>
-
-                    <div class="form-check form-switch mb-3">
-                      <input formControlName="cibleUrbains" class="form-check-input" type="checkbox" role="switch" id="switchCheckChecked">
-                      <label class="form-check-label" for="switchCheckChecked">Urbains</label>
-                    </div>
-
-                    <div class="form-check form-switch mb-3">
-                      <input formControlName="cibleRuraux" class="form-check-input" type="checkbox" role="switch" id="switchCheckChecked" >
-                      <label class="form-check-label" for="switchCheckChecked">Ruraux</label>
-                    </div>
-
-                    <div class="form-check form-switch mb-3">
-                      <input formControlName="cibleFaiblesRevenus" class="form-check-input" type="checkbox" role="switch" id="switchCheckChecked">
-                      <label class="form-check-label" for="switchCheckChecked">faibles revenus</label>
-                    </div>
-
-                  </div>
-                </div>
-
-                <div class="d-flex justify-content-between mt-3">
-                  <button (click)="previousStep()" type="button" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-2"></i>
-                    Précédent
-                  </button>
-                  <button [disabled]="chargementEngagement || projetForm.get('exAntes')?.invalid || projetForm.get('exPosts')?.invalid"
-                          (click)="enregistrerFinances()" type="button" class="btn btn-outline-primary">
-                    Continuer
-                    <i class="bi bi-arrow-right ms-2"></i>
-                  </button>
-                </div>
+                @if(etape===5){
+                  <app-financements-projet
+                    [projetId]="engagementProjet.projetId"
+                    (etapeEmitter)="suivant($event)">
+                  </app-financements-projet>
+                }
               </ng-template>
             </p-step-panel>
--->
             <!--
             <p-step-panel [value]="6">
               <ng-template #content let-activateCallback="activateCallback">

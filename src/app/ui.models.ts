@@ -194,11 +194,11 @@ export interface Cible {
 
 export interface ProjetFinanceDto {
   projetId: number;
-  envTotale: number;
-  finePublic: number;
-  fineHorsBudget: number;
-  maturite: number;
-  cibles:string[];
+  envTotale: number | null;
+  finePublic: number | null;
+  fineHorsBudget: number | null;
+  maturite: string | null;
+  cibles: string[];
 }
 
 export interface JalonProjetDto {
