@@ -7,10 +7,19 @@ import { User } from './domain.models';
 import { Avatar } from 'primeng/avatar';
 import { BadgeDirective } from 'primeng/badge';
 import { environment } from '../environments/environment';
+import { Tooltip } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, NgOptimizedImage, RouterLinkActive, Avatar, BadgeDirective],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    NgOptimizedImage,
+    RouterLinkActive,
+    Avatar,
+    BadgeDirective,
+    Tooltip,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
@@ -42,17 +51,17 @@ export class App implements OnInit {
 
   logout() {
     this.auth.logout().subscribe({
-      error:(err)=>{
+      error: (err) => {
         console.log(`ne peut se déconnecter ${err}`);
       },
-      complete: ()=>{
+      complete: () => {
         const currentUrl = this.document.location.href;
-        console.log('dest ',environment.AUTH_URL);
+        console.log('dest ', environment.AUTH_URL);
         console.log('currentUrl', currentUrl);
         const newUrl = `${environment.AUTH_URL}?origin=${encodeURIComponent(currentUrl)}`;
         console.log('newUrl', newUrl);
-        this.document.location.href=newUrl;
-      }
+        this.document.location.href = newUrl;
+      },
     });
   }
 
@@ -63,5 +72,4 @@ export class App implements OnInit {
       modal.show();
     }
   }
-
 }

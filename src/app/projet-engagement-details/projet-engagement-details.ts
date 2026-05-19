@@ -31,6 +31,7 @@ import { ActivitesProjet } from '../fragments/activites-projet/activites-projet'
 import { EtatsAvancements } from '../fragments/etats-avancements/etats-avancements';
 import { IndicPilotage } from '../fragments/indic-pilotage/indic-pilotage';
 import { FinancementsProjet } from '../fragments/financements-projet/financements-projet';
+import { RecapProjet } from '../fragments/recap-projet/recap-projet';
 
 
 @Component({
@@ -49,6 +50,7 @@ import { FinancementsProjet } from '../fragments/financements-projet/financement
     EtatsAvancements,
     IndicPilotage,
     FinancementsProjet,
+    RecapProjet,
   ],
   templateUrl: './projet-engagement-details.html',
   styleUrl: './projet-engagement-details.scss',
@@ -270,8 +272,6 @@ export class ProjetEngagementDetails implements OnInit {
     this.etape = this.etape - 1;
     this.cdr.detectChanges();
   }
-
-
 
   protected onStepChange(activeIndex: number | undefined) {
     console.log('onStepChange', activeIndex);

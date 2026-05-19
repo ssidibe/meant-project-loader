@@ -11,6 +11,9 @@
     [value]="users">
     <ng-template #caption>
       <p-multiSelect display="chip" [options]="colonnes" [(ngModel)]="selectedColumns" optionLabel="entete" selectedItemsLabel="{0} columns selected" [style]="{ 'min-width': '200px' }" placeholder="Choose Columns" />
+      <button class="iconAddUser" (click)="showDialog()" >
+        Ajouter
+      </button>
     </ng-template>
     <ng-template #emptymessage>
       <tr>
@@ -78,3 +81,101 @@
     </ng-template>
   </p-table>
 </div>
+
+
+<p-dialog [(visible)]="editMode" [modal]="true" [style]="{ width: '40rem' }">
+  <ng-template #headless>
+    <div style="max-height:90vh" class="p-4 border border-primary m-2 rounded-3 overflow-auto">
+      <div class=" text-primary  p-2 h5">
+        Ajout nouvel utilisateur
+      </div>
+      <form [formGroup]="userForm">
+        <div class="form-floating mb-3">
+          <select
+            [class.is-valid]="userForm.get('titre')?.touched && userForm.get('titre')?.valid"
+            [class.is-invalid]="userForm.get('titre')?.touched && userForm.get('titre')?.invalid"
+            formControlName="titre" class="form-select" id="floatingSelect" aria-label="Floating label select example">
+            <option [value]="''">Choisir</option>
+            @for(c of civilites; track $index){
+              <option [value]="c">{{c}}</option>
+            }
+          </select>
+          <label for="floatingSelect">Civilité</label>
+        </div>
+        <div class="form-floating mb-3">
+          <input
+            [class.is-valid]="userForm.get('prenom')?.touched && userForm.get('prenom')?.valid"
+            [class.is-invalid]="userForm.get('prenom')?.touched && userForm.get('prenom')?.invalid"
+
+            formControlName="prenom" type="text" class="form-control" id="prenomInput" placeholder="name@example.com">
+          <label for="prenomInput">Prénom <span class="fw-bolder">*</span></label>
+        </div>
+        <div class="form-floating mb-3">
+          <input
+            [class.is-valid]="userForm.get('nom')?.touched && userForm.get('nom')?.valid"
+            [class.is-invalid]="userForm.get('nom')?.touched && userForm.get('nom')?.invalid"
+            formControlName="nom" type="text" class="form-control" id="nomInput" placeholder="name@example.com">
+          <label for="nomInput">Nom <span class="fw-bolder">*</span></label>
+        </div>
+        <div class="form-floating mb-3">
+          <input [class.is-valid]="userForm.get('email')?.touched && userForm.get('email')?.valid"
+                 [class.is-invalid]="userForm.get('email')?.touched && userForm.get('email')?.invalid"
+                 formControlName="email" type="email" class="form-control" id="emailInput" placeholder="name@example.com">
+          <label for="emailInput">Email <span class="fw-bolder">*</span></label>
+        </div>
+        <div class="form-floating mb-3">
+          <input formControlName="pwd1" type="password" class="form-control" id="pwd1Input" placeholder="name@example.com">
+          <label for="pwd1Input">Mot de passe <span class="fw-bolder">*</span></label>
+        </div>
+        <div class="mb-3">
+          <div class="form-floating">
+            <input formControlName="pwd2" type="password" class="form-control" id="pwd2Input" placeholder="name@example.com">
+            <label for="pwd2Input">Mot de passe <span class="fw-bolder">*</span></label>
+          </div>
+          @if (userForm.get('pwd2')?.touched && userForm.hasError('passwordMismatch')){
+            <div class="meantErreur" >Les mots de passe ne correspondent pas.</div>
+          }
+
+        </div>
+        <div class="form-floating mb-3">
+          <input formControlName="tel" type="tel" class="form-control" id="telInput" placeholder="name@example.com">
+          <label for="telInput">Téléphone</label>
+        </div>
+
+        <div class="form-floating mb-3">
+          <select formControlName="structure" class="form-select" id="floatingSelect" aria-label="Floating label select example">
+            @if (loadingStructures){
+              <option [value]="null">Chargement des structures...</option>
+            } @else {
+              <option [value]="null">Choisir</option>
+            }
+            @for (s of structures; track $index;){
+              <option [value]="s.code" class="border">{{s.code}} {{s.nom}}</option>
+            }
+          </select>
+          <label for="floatingSelect">Structure de rattachement<span class="fw-bolder">*</span></label>
+        </div>
+
+        <div class="form-check form-switch mb-3">
+          <input formControlName="enabled" class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
+          <label class="form-check-label" for="switchCheckDefault">Activer le compte</label>
+        </div>
+        <div class="text-end">
+          <div class="meantErreur">{{editError}}</div>
+          <button type="button" class="btn btn-outline-danger m-2" (click)="editMode=false">Annuler</button>
+          <button (click)="inscrireUser()" type="submit" class="btn btn-success m-2" [disabled]="userForm.invalid">
+            Enregistrer
+            @if (saving){
+              <div class="spinner-border spinner-border-sm" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            } @else {
+              <i class="bi bi-person-fill-add"></i>
+            }
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </ng-template>
+</p-dialog>

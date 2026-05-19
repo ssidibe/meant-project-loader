@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
-import { UserDto } from '../domain.models';
+import { InscriptionRequest, User, UserDto } from '../domain.models';
 
 @Injectable({
   providedIn: 'root',
@@ -16,5 +16,11 @@ export class UserService {
     const url = `${this.authBaseUrl}/users`;
     console.log('url', url);
     return this.http.get<UserDto[]>(url);
+  }
+
+  inscrire(user: InscriptionRequest):Observable<UserDto[]> {
+    const url = `${this.authBaseUrl}/users`;
+    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+    return this.http.put<UserDto[]>(url, user, { headers: headers });
   }
 }

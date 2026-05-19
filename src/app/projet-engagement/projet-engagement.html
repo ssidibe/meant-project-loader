@@ -56,8 +56,32 @@
                   <div class="small fw-bold">OS {{projet.axe.numero}}.{{projet.os.numero}}</div>
                   <div>{{projet.os.nom}}</div>
                 }
+                @case ('porteur'){
+                  <span class="meantAbrev" [pTooltip]="projet.porteur.nom">
+                    {{projet.porteur.code}}
+                  </span>
+                }
+                @case ('partenaires'){
+                  @if (projet.partenaires){
+                    @for (partenaire of projet.partenaires; track $index){
+                      <div>
+                      <span class="meantAbrev my-1" [pTooltip]="partenaire.nom">
+                        {{partenaire.code}}
+                      </span>
+                      </div>
+                    }
+                  } @else {
+                    <span class="meantErreur">pas de partenaire</span>
+                  }
+                }
+                @case ('programme.nom'){
+                  {{projet.programme.nom}}
+                }
+                @case ('nom'){
+                  {{projet.nom}}
+                }
                 @default {
-                  {{ getNestedValue(projet,col.champ) }}
+                  <span style="white-space: nowrap">{{ getNestedValue(projet,col.champ) }}</span>
                 }
               }
             </td>

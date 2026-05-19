@@ -8,10 +8,11 @@ import { Router } from '@angular/router';
 import { Skeleton } from 'primeng/skeleton';
 import { Button } from 'primeng/button';
 import { MultiSelect } from 'primeng/multiselect';
+import { Tooltip } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-projet-engagement',
-  imports: [TableModule, FormsModule, Skeleton, MultiSelect, JsonPipe],
+  imports: [TableModule, FormsModule, Skeleton, MultiSelect, JsonPipe, Tooltip],
   templateUrl: './projet-engagement.html',
   styleUrl: './projet-engagement.scss',
 })
@@ -44,7 +45,7 @@ export class ProjetEngagement implements OnInit {
     },
     {
       entete: 'Porteur',
-      champ: 'porteur.code',
+      champ: 'porteur',
       searchTxt: 'Recherche porteur',
     },
     {
@@ -117,6 +118,7 @@ export class ProjetEngagement implements OnInit {
           }
         });
         this.listView = data;
+        console.log(this.listView);
       },
       error: (error) => {
         const status = error.status;

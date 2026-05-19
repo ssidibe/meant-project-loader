@@ -1,6 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 @use "variables" as var;
 
+@use "../node_modules/bootstrap-icons/font/bootstrap-icons";
+
 @use "bootstrap/scss/bootstrap" with (
   $primary: var.$primary,
   $secondary: var.$secondary,
@@ -105,3 +107,21 @@ main {
   @extend .rounded-3;
 }
 
+.meantAbrev{
+  color: blue;
+}
+
+.iconAddUser{
+  @extend .btn;
+  @extend .btn-link;
+  @extend .bi;
+  @extend .bi-person-add;
+  @extend .ms-5;
+  cursor: pointer;
+  font-size: 16px;
+  text-decoration: none;
+  &:hover{
+    @extend .bi-person-fill-add;
+    @extend .text-primary;
+  }
+}

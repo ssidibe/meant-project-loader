@@ -36,6 +36,7 @@ function isIgnoredUrl(url: string): boolean {
     url.includes('/auth/refresh') ||
     url.includes('/auth/logout') ||
     url.includes('/assets') ||
+    url.includes('/public') ||
     url.includes(LOGIN_URL)
   );
 }

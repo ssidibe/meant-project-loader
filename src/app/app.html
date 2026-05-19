@@ -47,7 +47,7 @@
         }
         <li>
           <a routerLink="/projets/fiches" routerLinkActive="activeMenuItem">
-            <i class="bi bi-file-earmark-pdf"></i>
+            <i [pTooltip]="collapsed?'Fiches Projet':''" class="bi bi-file-earmark-pdf"></i>
             @if (!collapsed){
               <span >
               Fiches Projet
@@ -61,10 +61,10 @@
           <a routerLink="/feuille-de-route" routerLinkActive="activeMenuItem" >
             <!--img src="/images/contract-icon.svg" width="24x" alt="contrat"/-->
             <!--i class="bi bi-pin-angle"></i-->
-            <i class="bi bi-pin-map-fill"></i>
+            <i [pTooltip]="collapsed?'Feuilles de route':''" class="bi bi-pin-map-fill"></i>
             @if (!collapsed){
               <span >
-              Feuilles de route
+                Feuilles de route
             </span>
             }</a>
         </li>
@@ -72,7 +72,7 @@
         @if (user && (user.roles.includes('ADMIN')||user.roles.includes('SUPERVISEUR'))){
           <li>
             <a routerLink="/users" routerLinkActive="activeMenuItem">
-              <i class="bi bi-people"></i>
+              <i [pTooltip]="collapsed?'affiche utilisateurs':''" class="bi bi-people"></i>
               @if (!collapsed){
               <span >
                 Utilisateurs

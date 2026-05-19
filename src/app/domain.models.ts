@@ -101,3 +101,17 @@ export interface UserDto {
   roles: string[];
   createurId?:number;
 }
+
+export interface InscriptionRequest {
+  email: string;
+  password: string;
+  enabled: boolean;
+  verified: boolean;
+  titre: string;
+  prenom: string;
+  nom: string;
+  telephone?: string;
+  structure: string;
+  roles: string[];
+  createurId?: number;
+}

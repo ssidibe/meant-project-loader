@@ -34,7 +34,6 @@ export class EtatsAvancements implements OnInit {
   trimestreMonth = [2, 5, 8, 11];
   chargementListExAntePost: boolean = false;
   chargementListExAntePostError: string = '';
-  listExAntePost: AvancementProjetAnnuelDto[] = [];
   engagementProjet?: EngagementProjetDto;
   msg = '';
   chargement = false;
@@ -225,57 +224,5 @@ export class EtatsAvancements implements OnInit {
     });
 
     this.cdr.detectChanges();
-  }
-
-  private chargerDonnees(projetId: number, year: number) {
-    this.setLoading(true);
-    this.engagementService.getEngagementByProjetId(projetId).subscribe({
-      next: (engagementProjet: EngagementProjetDto) => {
-        console.log('donnees reçu', engagementProjet);
-        this.engagementProjet = engagementProjet;
-      },
-      error: (error) => {
-        console.error('error', error);
-        const status = error.status;
-        if (status === 454) {
-          this.msg = `Engagement du projet id=${projetId} introuvable`;
-        } else {
-          console.error(`Erreur code : ${status}, ${error}`);
-          this.msg = `Erreur code : ${status}`;
-        }
-        this.setLoading(false);
-      },
-      complete: () => {
-        console.log('done');
-        ////////this.loadForm();
-        this.setLoading(false);
-        this.chargementsEngagementFromApi(projetId, year);
-      },
-    });
-    console.log('getEngagementTauxProjetId ', projetId, year);
-  }
-
-  private loadListAvancementsAnnuels() {
-    this.chargementListExAntePostError = '';
-    this.listExAntePost = [];
-    if (this.engagementProjet) {
-      this.engagementService.loadRecap(this.engagementProjet.projetId).subscribe({
-        next: (data) => {
-          this.listExAntePost = data;
-          console.log('listProjetsAnnuels', data);
-        },
-        error: (err) => {
-          this.chargementListExAntePostError = `${err}`;
-          this.chargementListExAntePost = false;
-          this.cdr.detectChanges();
-        },
-        complete: () => {
-          this.chargementListExAntePost = false;
-          this.cdr.detectChanges();
-        },
-      });
-    } else {
-      this.chargementListExAntePostError = 'pas de projet selectionné';
-    }
   }
 }
